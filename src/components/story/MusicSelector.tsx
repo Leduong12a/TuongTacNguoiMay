@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Music, ChevronDown, Check, PlusCircle, X, Search } from 'lucide-react'
 
 export interface Song {
