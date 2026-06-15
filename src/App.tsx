@@ -75,6 +75,7 @@ function App() {
 
   // OTP Verification Form States
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''))
+  const [otpError, setOtpError] = useState('')
   const [timeLeft, setTimeLeft] = useState(179) // 2:59 (179 seconds)
   const otpRefs = useRef<HTMLInputElement[]>([])
 
@@ -165,6 +166,7 @@ function App() {
       // Go to OTP validation screen instead of returning to login
       setTimeLeft(179) // Reset timer to 2:59
       setOtp(Array(6).fill('')) // Reset OTP inputs
+      setOtpError('') // Reset OTP errors
       setView('otp_verification')
     }
   }
@@ -179,6 +181,11 @@ function App() {
 
   // OTP Passcode Input Handles
   const handleOtpChange = (val: string, index: number) => {
+    // Clear any previous error on typing
+    if (otpError) {
+      setOtpError('')
+    }
+
     const cleanVal = val.replace(/[^0-9]/g, '')
     if (!cleanVal) return
 
@@ -193,6 +200,11 @@ function App() {
   }
 
   const handleOtpKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+    // Clear any previous error on backspace
+    if (otpError) {
+      setOtpError('')
+    }
+
     if (e.key === 'Backspace') {
       const newOtp = [...otp]
       newOtp[index] = ''
@@ -207,6 +219,7 @@ function App() {
 
   const handleOtpPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault()
+    setOtpError('')
     const pastedData = e.clipboardData.getData('text').replace(/[^0-9]/g, '').substring(0, 6)
     if (pastedData.length === 6) {
       const newOtp = pastedData.split('')
@@ -220,24 +233,27 @@ function App() {
     e.preventDefault()
     const otpCode = otp.join('')
     if (otpCode.length < 6) {
-      alert('Vui lòng nhập đầy đủ mã xác thực gồm 6 chữ số.')
+      setOtpError('Vui lòng nhập đầy đủ mã xác thực gồm 6 chữ số.')
       return
     }
 
     // Demo check: Accept '123456' as correct security code
     if (otpCode === '123456') {
+      setOtpError('')
       alert('Xác thực thành công! Hệ thống sẽ chuyển bạn về trang đăng nhập để đặt lại mật khẩu.')
       setView('login')
       setForgotEmailOrPhone('')
       setForgotSubmitted(false)
     } else {
-      alert('Mã xác thực không chính xác. Vui lòng nhập lại (Mã mặc định là: 123456)')
+      setOtpError('Mã xác thực không chính xác, vui lòng kiểm tra lại.')
     }
   }
 
   const handleResendOtp = () => {
+    setOtpError('')
     if (timeLeft === 0) {
       setTimeLeft(179)
+      setOtp(Array(6).fill(''))
       alert('Một mã bảo mật mới đã được gửi đi!')
     } else {
       alert(`Vui lòng đợi thêm ${formatTime(timeLeft)} để yêu cầu gửi lại mã.`)
@@ -461,7 +477,7 @@ function App() {
           <form onSubmit={handleOtpSubmit} className="w-full flex flex-col items-center">
             
             {/* OTP 6-Digit Grid */}
-            <div className="flex justify-between gap-2.5 mb-6 w-full max-w-[360px]">
+            <div className="flex justify-between gap-2.5 mb-4 w-full max-w-[360px]">
               {otp.map((digit, index) => (
                 <input
                   key={index}
@@ -474,10 +490,21 @@ function App() {
                   onChange={(e) => handleOtpChange(e.target.value, index)}
                   onKeyDown={(e) => handleOtpKeyDown(e, index)}
                   onPaste={index === 0 ? handleOtpPaste : undefined}
-                  className="w-12 h-12 text-center text-xl font-bold border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2B78E4] focus:border-[#2B78E4] transition-all duration-150"
+                  className={`w-12 h-12 text-center text-xl font-bold border rounded-lg focus:outline-none focus:ring-2 transition-all duration-150 ${
+                    otpError
+                      ? 'border-[#D32F2F] focus:ring-[#D32F2F]/20 focus:border-[#D32F2F] bg-red-50/10'
+                      : 'border-slate-300 focus:ring-[#2B78E4]/20 focus:border-[#2B78E4]'
+                  }`}
                 />
               ))}
             </div>
+
+            {/* Error Message for OTP */}
+            {otpError && (
+              <span className="text-[13px] font-bold text-[#D32F2F] mb-4 text-center animate-fadeIn">
+                {otpError}
+              </span>
+            )}
 
             {/* Countdown Timer */}
             <div className="flex items-center justify-center text-[14px] text-[#4A4A4A] mb-3">
@@ -504,6 +531,7 @@ function App() {
                 onClick={() => {
                   setView('forgot_password')
                   setOtp(Array(6).fill(''))
+                  setOtpError('')
                 }}
                 className="flex-1 h-12 bg-white hover:bg-slate-50 active:bg-slate-100 border border-slate-300 text-[#1A1A1A] font-bold rounded-lg transition-all duration-200 cursor-pointer flex items-center justify-center text-[15px]"
               >
