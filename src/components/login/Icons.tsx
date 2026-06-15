@@ -56,3 +56,25 @@ export const HourglassIcon = () => (
     <path d="M5 22v-4c0-4 3-7 7-7s7 3 7 7v4" />
   </svg>
 )
+
+// Custom Reset Lock Icon for the reset password screen matching the reference image
+export const ResetLockIcon = () => (
+  <div className="w-14 h-14 bg-[#0056C6] rounded-full flex items-center justify-center mb-6 shadow-sm transform transition-transform hover:scale-105 duration-200">
+    <svg
+      className="w-6 h-6 text-white"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+      {/* Reset/History circular arrow */}
+      <path d="M12 14a2 2 0 1 1-2 2" />
+      <path d="M10 14h2v2" />
+    </svg>
+  </div>
+)

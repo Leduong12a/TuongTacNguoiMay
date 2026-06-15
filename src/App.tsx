@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-route
 import { Login } from './components/login/Login'
 import { ForgotPassword } from './components/login/ForgotPassword'
 import { OtpVerification } from './components/login/OtpVerification'
+import { ResetPassword } from './components/login/ResetPassword'
 
 function AppContent() {
   const navigate = useNavigate()
@@ -16,7 +17,12 @@ function AppContent() {
   }
 
   const handleOtpSuccess = () => {
-    alert('Xác thực thành công! Hệ thống sẽ chuyển bạn về trang đăng nhập để đặt lại mật khẩu.')
+    // Navigate to reset password page instead of returning to login
+    navigate('/reset-password')
+  }
+
+  const handleResetPasswordSuccess = () => {
+    alert('Mật khẩu mới đã được cập nhật thành công!')
     navigate('/')
   }
 
@@ -56,6 +62,15 @@ function AppContent() {
             <OtpVerification
               onCancel={() => navigate('/forgot-password')}
               onSuccess={handleOtpSuccess}
+            />
+          }
+        />
+        <Route
+          path="/reset-password"
+          element={
+            <ResetPassword
+              onNavigateToLogin={() => navigate('/')}
+              onSuccess={handleResetPasswordSuccess}
             />
           }
         />
