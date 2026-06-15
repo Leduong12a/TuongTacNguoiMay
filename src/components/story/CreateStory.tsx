@@ -1,5 +1,7 @@
-import React, { useState } from 'react'
-import { X, AlignCenter, AlignLeft, AlignRight, Type, Search, Music, Sparkles, User } from 'lucide-react'
+import React, { useState, useRef, useEffect } from 'react'
+import { X, AlignCenter, AlignLeft, AlignRight, Type, Search, Music, Sparkles, User, ChevronDown, Check } from 'lucide-react'
+import { MusicSelector, mockSongs } from './MusicSelector'
+import type { Song } from './MusicSelector'
 
 interface CreateStoryProps {
   onClose: () => void
@@ -33,14 +35,34 @@ export const CreateStory: React.FC<CreateStoryProps> = ({ onClose, onShare }) =>
   const [selectedFont, setSelectedFont] = useState<string>('sans')
   const [selectedAlignment, setSelectedAlignment] = useState<string>('center')
   
+  // Dropdown states
+  const [isFontDropdownOpen, setIsFontDropdownOpen] = useState(false)
+  const [isAlignDropdownOpen, setIsAlignDropdownOpen] = useState(false)
+  
+  const fontDropdownRef = useRef<HTMLDivElement>(null)
+  const alignDropdownRef = useRef<HTMLDivElement>(null)
+
   // Music states
-  const [hasMusic, setHasMusic] = useState<boolean>(true)
+  const [selectedSong, setSelectedSong] = useState<Song | null>(mockSongs[0])
   const [trimStart, setTrimStart] = useState<number>(2) // start at 0:02
-  const songDuration = 30 // mock total duration
 
   const activeBgObj = backgrounds.find(b => b.id === selectedBg) || backgrounds[0]
   const activeFontObj = fonts.find(f => f.id === selectedFont) || fonts[0]
   const activeAlignObj = alignments.find(a => a.id === selectedAlignment) || alignments[0]
+
+  // Close dropdowns on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (fontDropdownRef.current && !fontDropdownRef.current.contains(e.target as Node)) {
+        setIsFontDropdownOpen(false)
+      }
+      if (alignDropdownRef.current && !alignDropdownRef.current.contains(e.target as Node)) {
+        setIsAlignDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const handleShareStory = () => {
     onShare({
@@ -48,15 +70,8 @@ export const CreateStory: React.FC<CreateStoryProps> = ({ onClose, onShare }) =>
       bgStyle: activeBgObj.value,
       fontStyle: activeFontObj.className,
       alignment: activeAlignObj.justify,
-      songName: hasMusic ? 'Lofi Chill Beats' : null
+      songName: selectedSong ? selectedSong.title : null
     })
-  }
-
-  // Format time (e.g. 2 -> "0:02")
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins}:${secs < 10 ? '0' + secs : secs}`
   }
 
   return (
@@ -102,31 +117,85 @@ export const CreateStory: React.FC<CreateStoryProps> = ({ onClose, onShare }) =>
               
               {/* Text formatting row */}
               <div className="flex justify-between items-center mt-1">
-                {/* Font Selector Toggle */}
-                <button
-                  onClick={() => {
-                    const currentIndex = fonts.findIndex(f => f.id === selectedFont)
-                    const nextIndex = (currentIndex + 1) % fonts.length
-                    setSelectedFont(fonts[nextIndex].id)
-                  }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 rounded-lg text-xs font-bold text-slate-600 cursor-pointer transition-colors"
-                >
-                  <Type className="w-3.5 h-3.5" />
-                  <span>Phông chữ ({activeFontObj.name})</span>
-                </button>
+                {/* Font Selector Dropdown */}
+                <div className="relative" ref={fontDropdownRef}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsFontDropdownOpen(!isFontDropdownOpen)
+                      setIsAlignDropdownOpen(false)
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 rounded-lg text-xs font-bold text-slate-600 cursor-pointer transition-colors focus:outline-none"
+                  >
+                    <Type className="w-3.5 h-3.5" />
+                    <span>Phông chữ ({activeFontObj.name})</span>
+                    <ChevronDown className="w-3 h-3 opacity-60 ml-0.5" />
+                  </button>
 
-                {/* Alignment Selector Toggle */}
-                <button
-                  onClick={() => {
-                    const currentIndex = alignments.findIndex(a => a.id === selectedAlignment)
-                    const nextIndex = (currentIndex + 1) % alignments.length
-                    setSelectedAlignment(alignments[nextIndex].id)
-                  }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 rounded-lg text-xs font-bold text-slate-600 cursor-pointer transition-colors"
-                >
-                  {React.createElement(activeAlignObj.icon, { className: 'w-3.5 h-3.5' })}
-                  <span>{activeAlignObj.label}</span>
-                </button>
+                  {isFontDropdownOpen && (
+                    <div className="absolute left-0 mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl z-30 py-1 w-40 overflow-hidden animate-scaleUp">
+                      {fonts.map((f) => (
+                        <button
+                          key={f.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedFont(f.id)
+                            setIsFontDropdownOpen(false)
+                          }}
+                          className={`w-full flex items-center justify-between px-3.5 py-2.5 hover:bg-slate-50 text-left text-xs font-bold transition-colors focus:outline-none ${
+                            selectedFont === f.id ? 'text-[#0056C6] bg-blue-50/20 font-bold' : 'text-slate-700'
+                          } ${f.className}`}
+                        >
+                          <span>{f.name}</span>
+                          {selectedFont === f.id && <Check className="w-3.5 h-3.5 text-[#0056C6]" />}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Alignment Selector Dropdown */}
+                <div className="relative" ref={alignDropdownRef}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAlignDropdownOpen(!isAlignDropdownOpen)
+                      setIsFontDropdownOpen(false)
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 rounded-lg text-xs font-bold text-slate-600 cursor-pointer transition-colors focus:outline-none"
+                  >
+                    {React.createElement(activeAlignObj.icon, { className: 'w-3.5 h-3.5 animate-fadeIn' })}
+                    <span>{activeAlignObj.label}</span>
+                    <ChevronDown className="w-3 h-3 opacity-60 ml-0.5" />
+                  </button>
+
+                  {isAlignDropdownOpen && (
+                    <div className="absolute right-0 mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl z-30 py-1 w-36 overflow-hidden animate-scaleUp">
+                      {alignments.map((a) => {
+                        const Icon = a.icon
+                        return (
+                          <button
+                            key={a.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedAlignment(a.id)
+                              setIsAlignDropdownOpen(false)
+                            }}
+                            className={`w-full flex items-center justify-between px-3.5 py-2.5 hover:bg-slate-50 text-left text-xs font-bold transition-colors focus:outline-none ${
+                              selectedAlignment === a.id ? 'text-[#0056C6] bg-blue-50/20' : 'text-slate-700'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <Icon className="w-3.5 h-3.5" />
+                              <span>{a.label}</span>
+                            </div>
+                            {selectedAlignment === a.id && <Check className="w-3.5 h-3.5 text-[#0056C6]" />}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -148,90 +217,13 @@ export const CreateStory: React.FC<CreateStoryProps> = ({ onClose, onShare }) =>
               </div>
             </div>
 
-            {/* Sound Selection Card */}
-            {hasMusic && (
-              <div className="flex flex-col gap-2">
-                <div className="flex justify-between items-baseline">
-                  <label className="text-[12.5px] font-bold text-slate-400 uppercase tracking-wider">🎵 Âm thanh</label>
-                  <button
-                    onClick={() => setHasMusic(false)}
-                    className="text-xs font-bold text-[#0056C6] hover:underline cursor-pointer"
-                  >
-                    Xóa
-                  </button>
-                </div>
-
-                {/* Music Card */}
-                <div className="bg-slate-50/70 border border-slate-150 rounded-xl p-4 flex flex-col gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-lg bg-[#111] text-amber-500 font-bold flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
-                      <Music className="w-5 h-5 text-amber-500 animate-pulse" />
-                    </div>
-                    <div>
-                      <h4 className="text-[13.5px] font-bold text-slate-800 leading-tight">Lofi Chill Beats</h4>
-                      <p className="text-[11px] font-semibold text-slate-400">Chillhop Music</p>
-                    </div>
-                  </div>
-
-                  {/* Trimmer Area */}
-                  <div className="flex flex-col gap-2">
-                    {/* Time display indicator */}
-                    <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                      <span>{formatTime(trimStart)}</span>
-                      <span>{formatTime(trimStart + 15)}</span>
-                    </div>
-
-                    {/* Timeline Trimmer bar visual */}
-                    <div className="relative h-10 bg-slate-200/70 rounded-lg overflow-hidden flex items-end px-1 gap-[3px]">
-                      {/* Render mock audio wave columns */}
-                      {Array.from({ length: 24 }).map((_, i) => {
-                        const h = 15 + Math.sin(i * 0.8) * 12 + Math.cos(i * 0.3) * 6
-                        const indexPercent = (i / 24) * 100
-                        const isSelected = indexPercent >= (trimStart / songDuration) * 100 && indexPercent <= ((trimStart + 15) / songDuration) * 100
-                        return (
-                          <div
-                            key={i}
-                            style={{ height: `${Math.max(6, Math.min(32, h))}px` }}
-                            className={`flex-1 rounded-sm transition-colors duration-150 ${
-                              isSelected ? 'bg-[#0056C6]/80' : 'bg-slate-400/50'
-                            }`}
-                          />
-                        )
-                      })}
-
-                      {/* Sliding window selection highlight */}
-                      <div 
-                        style={{ 
-                          left: `${(trimStart / songDuration) * 100}%`, 
-                          width: `${(15 / songDuration) * 100}%` 
-                        }} 
-                        className="absolute top-0 bottom-0 border-2 border-[#0056C6] bg-[#0056C6]/10 pointer-events-none rounded-lg transition-all duration-150"
-                      />
-
-                      {/* Input range slider for actual sliding */}
-                      <input
-                        type="range"
-                        min="0"
-                        max={songDuration - 15}
-                        value={trimStart}
-                        onChange={(e) => setTrimStart(parseInt(e.target.value))}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {!hasMusic && (
-              <button
-                onClick={() => setHasMusic(true)}
-                className="w-full py-3 border border-dashed border-slate-350 hover:bg-slate-50 text-slate-600 font-bold text-xs rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
-              >
-                <Music className="w-4 h-4" />
-                Thêm âm thanh vào tin
-              </button>
-            )}
+            {/* Modular Music Selector */}
+            <MusicSelector
+              selectedSong={selectedSong}
+              onSelectSong={setSelectedSong}
+              trimStart={trimStart}
+              onChangeTrimStart={setTrimStart}
+            />
 
           </div>
 
@@ -290,15 +282,15 @@ export const CreateStory: React.FC<CreateStoryProps> = ({ onClose, onShare }) =>
               </div>
 
               {/* Footer music pill wrapper */}
-              {hasMusic && (
+              {selectedSong && (
                 <div className="w-full flex justify-center z-10 mb-2">
                   <div className="bg-white/90 backdrop-blur-sm px-3.5 py-2 rounded-xl shadow-md border border-white/40 flex items-center gap-2 max-w-[90%] transform transition-transform hover:scale-102 duration-150">
                     <div className="w-6 h-6 rounded-md bg-slate-900 text-amber-500 flex items-center justify-center">
                       <Music className="w-3 h-3 text-amber-500" />
                     </div>
                     <div className="flex flex-col min-w-0">
-                      <span className="text-[10.5px] font-bold text-slate-800 truncate leading-tight">Lofi Chill Beats</span>
-                      <span className="text-[8.5px] font-bold text-slate-400 truncate">Chillhop Music</span>
+                      <span className="text-[10.5px] font-bold text-slate-800 truncate leading-tight">{selectedSong.title}</span>
+                      <span className="text-[8.5px] font-bold text-slate-400 truncate">{selectedSong.artist}</span>
                     </div>
                   </div>
                 </div>
