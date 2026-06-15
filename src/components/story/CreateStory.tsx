@@ -1,11 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { X, AlignCenter, AlignLeft, AlignRight, Type, Search, Music, Sparkles, User, ChevronDown, Check } from 'lucide-react'
+import { 
+  X, AlignCenter, AlignLeft, AlignRight, Type, Search, Music, 
+  Sparkles, User, ChevronDown, Check, Globe, Users, Lock, UserPlus, ChevronRight 
+} from 'lucide-react'
 import { MusicSelector, mockSongs } from './MusicSelector'
-import type { Song } from './MusicSelector'
+import type { Song as SongType } from './MusicSelector'
 
 interface CreateStoryProps {
   onClose: () => void
-  onShare: (storyData: { text: string; bgStyle: string; fontStyle: string; alignment: string; songName: string | null }) => void
+  onShare: (storyData: { 
+    text: string 
+    bgStyle: string 
+    fontStyle: string 
+    alignment: string 
+    songName: string | null
+    audience: string 
+  }) => void
 }
 
 const backgrounds = [
@@ -29,6 +39,13 @@ const alignments = [
   { id: 'right', label: 'Căn phải', icon: AlignRight, justify: 'text-right justify-end' }
 ]
 
+const audienceOptions = [
+  { id: 'public', label: 'Công khai', desc: 'Bất kỳ ai trên hoặc ngoài ứng dụng', icon: Globe },
+  { id: 'friends', label: 'Bạn bè', desc: 'Chỉ bạn bè của bạn trên ứng dụng', icon: Users },
+  { id: 'only_me', label: 'Chỉ mình tôi', desc: 'Chỉ mình bạn có thể xem bài viết này', icon: Lock },
+  { id: 'specific', label: 'Bạn bè cụ thể', desc: 'Chỉ hiển thị với một số người bạn nhất định', icon: UserPlus }
+]
+
 export const CreateStory: React.FC<CreateStoryProps> = ({ onClose, onShare }) => {
   const [text, setText] = useState<string>('Chào ngày mới! ☀️')
   const [selectedBg, setSelectedBg] = useState<string>('gradient-pink')
@@ -43,12 +60,18 @@ export const CreateStory: React.FC<CreateStoryProps> = ({ onClose, onShare }) =>
   const alignDropdownRef = useRef<HTMLDivElement>(null)
 
   // Music states
-  const [selectedSong, setSelectedSong] = useState<Song | null>(mockSongs[0])
+  const [selectedSong, setSelectedSong] = useState<SongType | null>(mockSongs[0])
   const [trimStart, setTrimStart] = useState<number>(2) // start at 0:02
+
+  // Audience states
+  const [selectedAudience, setSelectedAudience] = useState<string>('public')
+  const [tempAudience, setTempAudience] = useState<string>('public') // temp state while modal is open
+  const [isAudienceModalOpen, setIsAudienceModalOpen] = useState<boolean>(false)
 
   const activeBgObj = backgrounds.find(b => b.id === selectedBg) || backgrounds[0]
   const activeFontObj = fonts.find(f => f.id === selectedFont) || fonts[0]
   const activeAlignObj = alignments.find(a => a.id === selectedAlignment) || alignments[0]
+  const activeAudienceObj = audienceOptions.find(a => a.id === selectedAudience) || audienceOptions[0]
 
   // Close dropdowns on click outside
   useEffect(() => {
@@ -70,8 +93,19 @@ export const CreateStory: React.FC<CreateStoryProps> = ({ onClose, onShare }) =>
       bgStyle: activeBgObj.value,
       fontStyle: activeFontObj.className,
       alignment: activeAlignObj.justify,
-      songName: selectedSong ? selectedSong.title : null
+      songName: selectedSong ? selectedSong.title : null,
+      audience: selectedAudience
     })
+  }
+
+  const handleOpenAudienceModal = () => {
+    setTempAudience(selectedAudience)
+    setIsAudienceModalOpen(true)
+  }
+
+  const handleSaveAudience = () => {
+    setSelectedAudience(tempAudience)
+    setIsAudienceModalOpen(false)
   }
 
   return (
@@ -103,7 +137,7 @@ export const CreateStory: React.FC<CreateStoryProps> = ({ onClose, onShare }) =>
           </div>
 
           {/* Config list (Scrollable) */}
-          <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-6">
+          <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-5">
             
             {/* Input Text Section */}
             <div className="flex flex-col gap-2">
@@ -164,7 +198,7 @@ export const CreateStory: React.FC<CreateStoryProps> = ({ onClose, onShare }) =>
                     }}
                     className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 rounded-lg text-xs font-bold text-slate-600 cursor-pointer transition-colors focus:outline-none"
                   >
-                    {React.createElement(activeAlignObj.icon, { className: 'w-3.5 h-3.5 animate-fadeIn' })}
+                    {React.createElement(activeAlignObj.icon, { className: 'w-3.5 h-3.5' })}
                     <span>{activeAlignObj.label}</span>
                     <ChevronDown className="w-3 h-3 opacity-60 ml-0.5" />
                   </button>
@@ -215,6 +249,22 @@ export const CreateStory: React.FC<CreateStoryProps> = ({ onClose, onShare }) =>
                   />
                 ))}
               </div>
+            </div>
+
+            {/* Audience privacy setting row */}
+            <div className="flex flex-col gap-2">
+              <label className="text-[12.5px] font-bold text-slate-400 uppercase tracking-wider">Đối tượng xem</label>
+              <button
+                type="button"
+                onClick={handleOpenAudienceModal}
+                className="bg-slate-50/70 border border-slate-150 rounded-xl p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-100/50 transition-colors w-full focus:outline-none text-left"
+              >
+                <div className="flex items-center gap-2.5 text-slate-700">
+                  {React.createElement(activeAudienceObj.icon, { className: 'w-4.5 h-4.5 text-[#0056C6]' })}
+                  <span className="text-[13.5px] font-bold">{activeAudienceObj.label}</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-400" />
+              </button>
             </div>
 
             {/* Modular Music Selector */}
@@ -303,6 +353,88 @@ export const CreateStory: React.FC<CreateStoryProps> = ({ onClose, onShare }) =>
         </div>
 
       </div>
+
+      {/* Select Audience Modal (Chọn đối tượng) */}
+      {isAudienceModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          
+          {/* Backdrop overlay */}
+          <div 
+            className="absolute inset-0 bg-slate-900/50 backdrop-blur-[1.5px] transition-opacity duration-300"
+            onClick={() => setIsAudienceModalOpen(false)}
+          />
+          
+          {/* Modal Container card */}
+          <div className="relative bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-[420px] p-6 z-50 flex flex-col gap-4 animate-scaleUp text-slate-800 font-sans">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <h3 className="text-[17px] font-bold text-slate-800">Chọn đối tượng</h3>
+              <button 
+                onClick={() => setIsAudienceModalOpen(false)}
+                className="p-1 hover:bg-slate-50 rounded-full text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Description */}
+            <p className="text-[12.5px] font-bold text-slate-400 leading-relaxed">
+              Ai có thể xem bài viết của bạn? Bài viết của bạn sẽ hiển thị trên Bảng tin, trang cá nhân và kết quả tìm kiếm.
+            </p>
+
+            {/* List options */}
+            <div className="flex flex-col mt-2">
+              {audienceOptions.map((option) => {
+                const Icon = option.icon
+                const isChecked = tempAudience === option.id
+                return (
+                  <div 
+                    key={option.id}
+                    onClick={() => setTempAudience(option.id)}
+                    className="flex items-center justify-between py-3.5 cursor-pointer select-none group border-b border-slate-100/50 last:border-b-0"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-colors ${
+                        isChecked 
+                          ? 'bg-[#E8F1FF] text-[#0056C6]' 
+                          : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-700'
+                      }`}>
+                        <Icon className="w-4.5 h-4.5" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[13.5px] font-bold text-slate-800 leading-snug">{option.label}</span>
+                        <span className="text-[11px] font-bold text-slate-400 mt-0.5 leading-snug">{option.desc}</span>
+                      </div>
+                    </div>
+
+                    {/* Radio circle indicator */}
+                    <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-150 ${
+                      isChecked 
+                        ? 'border-[#0056C6] bg-[#0056C6]' 
+                        : 'border-slate-300 bg-white group-hover:border-slate-400'
+                    }`}>
+                      {isChecked && <div className="w-2 h-2 rounded-full bg-white animate-scaleUp" />}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Done Action Button */}
+            <button
+              type="button"
+              onClick={handleSaveAudience}
+              className="w-full h-11 bg-[#0056C6] hover:bg-[#0047A5] text-white font-bold text-[14px] rounded-lg mt-3 shadow-sm hover:shadow transition-all duration-200 cursor-pointer flex items-center justify-center"
+            >
+              Xong
+            </button>
+
+          </div>
+
+        </div>
+      )}
+
     </div>
   )
 }
