@@ -154,16 +154,7 @@ export const OtpVerification: React.FC<OtpVerificationProps> = ({
         {/* Error Message for OTP */}
         {otpError && (
           <span className="text-[13px] font-bold text-[#D32F2F] mb-4 text-center animate-fadeIn">
-            {otpError
-              .split('\n')
-              .map((item, key) => {
-                return (
-                  <span key={key}>
-                    {item}
-                    <br />
-                  </span>
-                )
-              })}
+            {otpError}
           </span>
         )}
 

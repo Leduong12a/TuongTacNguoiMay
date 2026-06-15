@@ -1,8 +1,8 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom'
-import { Login } from './components/Login'
-import { ForgotPassword } from './components/ForgotPassword'
-import { OtpVerification } from './components/OtpVerification'
+import { Login } from './components/login/Login'
+import { ForgotPassword } from './components/login/ForgotPassword'
+import { OtpVerification } from './components/login/OtpVerification'
 
 function AppContent() {
   const navigate = useNavigate()
