@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Sidebar } from './Sidebar'
 import { Menu, X, User, Camera, Edit3 } from 'lucide-react'
+import { CreateStory } from './story/CreateStory'
 
 interface DashboardProps {
   onLogout: () => void
@@ -10,6 +11,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState<string>('profile')
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false)
+  const [isCreateStoryOpen, setIsCreateStoryOpen] = useState<boolean>(false)
+
 
   return (
     <div className="flex-1 flex h-screen overflow-hidden bg-white select-none relative">
@@ -111,8 +114,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               {/* Option 1: Tạo tin */}
               <button
                 onClick={() => {
-                  alert('Tính năng Tạo tin đang phát triển');
                   setIsCreateModalOpen(false);
+                  setIsCreateStoryOpen(true);
                 }}
                 className="bg-slate-50/70 border border-slate-150 hover:bg-slate-100/70 hover:border-slate-200/80 rounded-xl p-6 flex flex-col items-center justify-center gap-3 transition-all duration-200 cursor-pointer group active:scale-95 select-none focus:outline-none"
               >
@@ -147,6 +150,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             </button>
           </div>
         </div>
+      )}
+
+      {/* CreateStory Modal Overlay */}
+      {isCreateStoryOpen && (
+        <CreateStory
+          onClose={() => setIsCreateStoryOpen(false)}
+          onShare={(storyData) => {
+            alert('Đã chia sẻ tin của bạn thành công!');
+            console.log('Story Shared Data:', storyData);
+            setIsCreateStoryOpen(false);
+          }}
+        />
       )}
 
     </div>

@@ -17,51 +17,16 @@ export const Login: React.FC<LoginProps> = ({
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
-  const [isSubmitted, setIsSubmitted] = useState(false)
 
-  const validate = (value: string) => {
-    if (!value.trim()) {
-      return 'Vui lòng nhập Email hoặc Số điện thoại.'
-    }
-    
-    // Check if it's an email
-    if (value.includes('@')) {
-      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-      if (!emailRegex.test(value)) {
-        return 'Thông tin không hợp lệ, vui lòng kiểm tra lại'
-      }
-    } else {
-      // Check if it's a phone number (numeric, 9 to 11 digits)
-      const phoneRegex = /^[0-9]{9,11}$/
-      if (!phoneRegex.test(value)) {
-        return 'Thông tin không hợp lệ, vui lòng kiểm tra lại'
-      }
-    }
-    return ''
-  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSubmitted(true)
-
-    const formatError = validate(emailOrPhone)
-    
-    if (formatError) {
-      setError(formatError)
-    } else if (emailOrPhone !== 'admin@gmail.com' || password !== 'Password123') {
-      setError('Thông tin không hợp lệ, vui lòng kiểm tra lại')
-    } else {
-      setError('')
-      onLoginSuccess(emailOrPhone)
-    }
+    setError('')
+    onLoginSuccess(emailOrPhone)
   }
 
   const handleEmailOrPhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value
-    setEmailOrPhone(val)
-    if (isSubmitted) {
-      setError(validate(val))
-    }
+    setEmailOrPhone(e.target.value)
   }
 
   return (
