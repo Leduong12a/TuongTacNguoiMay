@@ -4,6 +4,7 @@ import { Login } from './components/login/Login'
 import { ForgotPassword } from './components/login/ForgotPassword'
 import { OtpVerification } from './components/login/OtpVerification'
 import { ResetPassword } from './components/login/ResetPassword'
+import { Register } from './components/login/Register'
 
 function AppContent() {
   const navigate = useNavigate()
@@ -17,12 +18,16 @@ function AppContent() {
   }
 
   const handleOtpSuccess = () => {
-    // Navigate to reset password page instead of returning to login
     navigate('/reset-password')
   }
 
   const handleResetPasswordSuccess = () => {
     alert('Mật khẩu mới đã được cập nhật thành công!')
+    navigate('/')
+  }
+
+  const handleRegisterSuccess = () => {
+    alert('Đăng ký tài khoản thành công!')
     navigate('/')
   }
 
@@ -35,6 +40,7 @@ function AppContent() {
             <Login
               onNavigateToForgotPassword={() => navigate('/forgot-password')}
               onLoginSuccess={handleLoginSuccess}
+              onNavigateToRegister={() => navigate('/register')}
             />
           }
         />
@@ -44,6 +50,7 @@ function AppContent() {
             <Login
               onNavigateToForgotPassword={() => navigate('/forgot-password')}
               onLoginSuccess={handleLoginSuccess}
+              onNavigateToRegister={() => navigate('/register')}
             />
           }
         />
@@ -71,6 +78,15 @@ function AppContent() {
             <ResetPassword
               onNavigateToLogin={() => navigate('/')}
               onSuccess={handleResetPasswordSuccess}
+            />
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <Register
+              onNavigateToLogin={() => navigate('/')}
+              onRegisterSuccess={handleRegisterSuccess}
             />
           }
         />

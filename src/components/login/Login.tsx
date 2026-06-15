@@ -5,11 +5,13 @@ import { ChatIcon, ErrorIcon } from './Icons'
 interface LoginProps {
   onNavigateToForgotPassword: () => void
   onLoginSuccess: (emailOrPhone: string) => void
+  onNavigateToRegister: () => void
 }
 
 export const Login: React.FC<LoginProps> = ({
   onNavigateToForgotPassword,
   onLoginSuccess,
+  onNavigateToRegister,
 }) => {
   const [emailOrPhone, setEmailOrPhone] = useState('')
   const [password, setPassword] = useState('')
@@ -170,12 +172,12 @@ export const Login: React.FC<LoginProps> = ({
       {/* Footer Register Link */}
       <div className="mt-8 text-[14px] text-[#4A4A4A] text-center font-medium">
         Chưa có tài khoản?{' '}
-        <a
-          href="#register"
-          className="font-bold text-[#0056C6] hover:underline transition-all duration-150 ml-1"
+        <button
+          onClick={onNavigateToRegister}
+          className="font-bold text-[#0056C6] hover:underline cursor-pointer ml-1 text-inherit"
         >
           Đăng ký ngay
-        </a>
+        </button>
       </div>
 
     </div>
