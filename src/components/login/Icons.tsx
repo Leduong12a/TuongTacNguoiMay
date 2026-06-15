@@ -1,5 +1,3 @@
-import React from 'react'
-
 // Custom Chat Bubble Icon matching the reference image
 export const ChatIcon = () => (
   <div className="w-14 h-14 bg-[#2B78E4] rounded-full flex items-center justify-center mb-6 shadow-sm transform transition-transform hover:scale-105 duration-200">

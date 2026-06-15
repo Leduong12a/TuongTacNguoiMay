@@ -1,19 +1,20 @@
-import React from 'react'
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom'
 import { Login } from './components/login/Login'
 import { ForgotPassword } from './components/login/ForgotPassword'
 import { OtpVerification } from './components/login/OtpVerification'
 import { ResetPassword } from './components/login/ResetPassword'
 import { Register } from './components/login/Register'
+import { Dashboard } from './components/Dashboard'
 
 function AppContent() {
   const navigate = useNavigate()
+  const location = useLocation()
 
-  const handleLoginSuccess = (emailOrPhone: string) => {
-    alert('Đăng nhập thành công với tài khoản: ' + emailOrPhone)
+  const handleLoginSuccess = (_emailOrPhone: string) => {
+    navigate('/dashboard')
   }
 
-  const handleForgotPasswordSuccess = (emailOrPhone: string) => {
+  const handleForgotPasswordSuccess = (_emailOrPhone: string) => {
     navigate('/verify-otp')
   }
 
@@ -31,8 +32,10 @@ function AppContent() {
     navigate('/')
   }
 
+  const isDashboard = location.pathname === '/dashboard'
+
   return (
-    <div className="flex-1 flex flex-col justify-center items-center px-4 py-12 sm:px-6 lg:px-8 bg-[#F7F9FC]">
+    <div className={isDashboard ? "w-full h-screen bg-white" : "flex-1 flex flex-col justify-center items-center px-4 py-12 sm:px-6 lg:px-8 bg-[#F7F9FC]"}>
       <Routes>
         <Route
           path="/"
@@ -87,6 +90,14 @@ function AppContent() {
             <Register
               onNavigateToLogin={() => navigate('/')}
               onRegisterSuccess={handleRegisterSuccess}
+            />
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <Dashboard
+              onLogout={() => navigate('/')}
             />
           }
         />
