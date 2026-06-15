@@ -5,12 +5,14 @@ interface SidebarProps {
   activeTab: string
   onTabChange: (tab: string) => void
   onLogout: () => void
+  onProfileClick?: () => void
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   onTabChange,
   onLogout,
+  onProfileClick,
 }) => {
   const menuItems = [
     { id: 'chat', label: 'Trò chuyện', icon: MessageSquare },
@@ -86,8 +88,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </button>
 
         {/* Profile Details */}
-        <div className="border-t border-slate-200 p-5 flex items-center gap-3 bg-slate-50/50">
-          <div className="w-10 h-10 rounded-xl bg-slate-200 flex items-center justify-center relative text-slate-500 shadow-inner">
+        <div 
+          onClick={onProfileClick}
+          className="border-t border-slate-200 p-5 flex items-center gap-3 bg-slate-50/50 hover:bg-slate-100/70 active:bg-slate-200/50 transition-colors duration-150 cursor-pointer"
+        >
+          <div className="w-10 h-10 rounded-xl bg-slate-200 flex items-center justify-center relative text-slate-500 shadow-inner transition-transform duration-150 active:scale-95">
             <User className="w-5 h-5" />
             <span className="absolute bottom-[-1.5px] right-[-1.5px] block h-3 w-3 rounded-full ring-[2px] ring-white bg-slate-400" />
           </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Sidebar } from './Sidebar'
-import { Menu, X, User } from 'lucide-react'
+import { Menu, X, User, Camera, Edit3 } from 'lucide-react'
 
 interface DashboardProps {
   onLogout: () => void
@@ -9,9 +9,10 @@ interface DashboardProps {
 export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState<string>('profile')
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false)
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false)
 
   return (
-    <div className="flex-1 flex h-screen overflow-hidden bg-white select-none">
+    <div className="flex-1 flex h-screen overflow-hidden bg-white select-none relative">
       
       {/* Mobile Top Header (hidden on Desktop) */}
       <div className="md:hidden h-14 bg-white border-b border-slate-200 w-full fixed top-0 left-0 right-0 px-4 flex items-center justify-between z-40">
@@ -44,6 +45,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           activeTab={activeTab} 
           onTabChange={setActiveTab} 
           onLogout={onLogout} 
+          onProfileClick={() => setIsCreateModalOpen(true)}
         />
       </div>
 
@@ -78,6 +80,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               setIsMobileSidebarOpen(false)
             }} 
             onLogout={onLogout} 
+            onProfileClick={() => setIsCreateModalOpen(true)}
           />
         </div>
       </div>
@@ -88,6 +91,63 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           {/* Nội dung tab {activeTab} trống */}
         </div>
       </main>
+
+      {/* Create Modal */}
+      {isCreateModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop overlay */}
+          <div 
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-[1.5px] transition-opacity duration-300"
+            onClick={() => setIsCreateModalOpen(false)}
+          />
+          
+          {/* Modal Content */}
+          <div className="relative bg-white rounded-2xl p-7 max-w-[420px] w-full mx-4 shadow-2xl border border-slate-100/80 z-50 transform transition-all duration-300 scale-100 flex flex-col">
+            <h3 className="text-[17px] font-bold text-slate-800 mb-6">Tạo mới</h3>
+            
+            {/* Grid options */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              
+              {/* Option 1: Tạo tin */}
+              <button
+                onClick={() => {
+                  alert('Tính năng Tạo tin đang phát triển');
+                  setIsCreateModalOpen(false);
+                }}
+                className="bg-slate-50/70 border border-slate-150 hover:bg-slate-100/70 hover:border-slate-200/80 rounded-xl p-6 flex flex-col items-center justify-center gap-3 transition-all duration-200 cursor-pointer group active:scale-95 select-none focus:outline-none"
+              >
+                <div className="w-12 h-12 rounded-full bg-blue-50/70 text-[#0056C6] flex items-center justify-center transition-colors group-hover:bg-blue-100">
+                  <Camera className="w-5.5 h-5.5" />
+                </div>
+                <span className="text-[14px] font-bold text-slate-700">Tạo tin</span>
+              </button>
+
+              {/* Option 2: Tạo bài viết */}
+              <button
+                onClick={() => {
+                  alert('Tính năng Tạo bài viết đang phát triển');
+                  setIsCreateModalOpen(false);
+                }}
+                className="bg-slate-50/70 border border-slate-150 hover:bg-slate-100/70 hover:border-slate-200/80 rounded-xl p-6 flex flex-col items-center justify-center gap-3 transition-all duration-200 cursor-pointer group active:scale-95 select-none focus:outline-none"
+              >
+                <div className="w-12 h-12 rounded-full bg-blue-50/70 text-[#0056C6] flex items-center justify-center transition-colors group-hover:bg-blue-100">
+                  <Edit3 className="w-5.5 h-5.5" />
+                </div>
+                <span className="text-[14px] font-bold text-slate-700">Tạo bài viết</span>
+              </button>
+
+            </div>
+
+            {/* Close action */}
+            <button
+              onClick={() => setIsCreateModalOpen(false)}
+              className="text-[14px] font-bold text-slate-400 hover:text-slate-600 transition-colors duration-150 cursor-pointer text-center pt-2 focus:outline-none"
+            >
+              Đóng
+            </button>
+          </div>
+        </div>
+      )}
 
     </div>
   )
