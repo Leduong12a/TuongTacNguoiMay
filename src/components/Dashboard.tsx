@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Sidebar } from './Sidebar'
 import { Menu, X, User, Camera, Edit3 } from 'lucide-react'
 import { CreateStory } from './story/CreateStory'
+import { CreatePost } from './post/CreatePost'
 
 interface DashboardProps {
   onLogout: () => void
@@ -12,6 +13,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false)
   const [isCreateStoryOpen, setIsCreateStoryOpen] = useState<boolean>(false)
+  const [isCreatePostOpen, setIsCreatePostOpen] = useState<boolean>(false)
 
 
   return (
@@ -128,8 +130,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               {/* Option 2: Tạo bài viết */}
               <button
                 onClick={() => {
-                  alert('Tính năng Tạo bài viết đang phát triển');
                   setIsCreateModalOpen(false);
+                  setIsCreatePostOpen(true);
                 }}
                 className="bg-slate-50/70 border border-slate-150 hover:bg-slate-100/70 hover:border-slate-200/80 rounded-xl p-6 flex flex-col items-center justify-center gap-3 transition-all duration-200 cursor-pointer group active:scale-95 select-none focus:outline-none"
               >
@@ -160,6 +162,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             alert('Đã chia sẻ tin của bạn thành công!');
             console.log('Story Shared Data:', storyData);
             setIsCreateStoryOpen(false);
+          }}
+        />
+      )}
+
+      {/* CreatePost Modal Overlay */}
+      {isCreatePostOpen && (
+        <CreatePost
+          onClose={() => setIsCreatePostOpen(false)}
+          onPublish={(postData) => {
+            alert('Đã đăng bài viết thành công!');
+            console.log('Post Published Data:', postData);
+            setIsCreatePostOpen(false);
           }}
         />
       )}
