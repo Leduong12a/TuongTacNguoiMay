@@ -72,13 +72,14 @@ function App() {
     e.preventDefault()
     setIsSubmitted(true)
 
-    const validationError = validate(emailOrPhone)
+    const formatError = validate(emailOrPhone)
     
-    if (validationError) {
-      setError(validationError)
+    if (formatError) {
+      setError(formatError)
+    } else if (emailOrPhone !== 'admin@gmail.com' || password !== 'Password123') {
+      setError('Thông tin không hợp lệ, vui lòng kiểm tra lại')
     } else {
       setError('')
-      // Reset success state after a delay or display alert
       alert('Đăng nhập thành công với tài khoản: ' + emailOrPhone)
       // Reset form on successful login
       setEmailOrPhone('')
