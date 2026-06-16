@@ -3,6 +3,7 @@ import { X, Image as ImageIcon, UserPlus, MapPin, Smile, User, Check } from 'luc
 import { PostPrivacySelector } from './PostPrivacySelector'
 import { MediaUpload } from './MediaUpload'
 import { PostMusicPlayer } from './PostMusicPlayer'
+import { ImageSelectorModal } from './ImageSelectorModal'
 
 interface CreatePostProps {
   onClose: () => void
@@ -25,6 +26,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onClose, onPublish }) =>
   const [text, setText] = useState<string>('Bạn đang nghĩ gì?')
   const [privacy, setPrivacy] = useState<string>('public')
   const [images, setImages] = useState<string[]>(mockPostImages)
+  const [isImageSelectorOpen, setIsImageSelectorOpen] = useState<boolean>(false)
   const [music, setMusic] = useState<{ title: string; artist: string } | null>({
     title: 'Lofi Chill Beats',
     artist: 'Various Artists'
@@ -47,11 +49,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onClose, onPublish }) =>
 
   // Quick toggles for tools
   const handleToggleImages = () => {
-    if (images.length > 0) {
-      setImages([])
-    } else {
-      setImages(mockPostImages)
-    }
+    setIsImageSelectorOpen(true)
   }
 
   const handleToggleLocation = () => {
@@ -149,7 +147,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onClose, onPublish }) =>
           <MediaUpload 
             images={images}
             onRemoveAll={() => setImages([])}
-            onEdit={() => alert('Chế độ chỉnh sửa hình ảnh')}
+            onEdit={() => setIsImageSelectorOpen(true)}
           />
 
           {/* Music player widget block */}
@@ -240,6 +238,18 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onClose, onPublish }) =>
         </div>
 
       </div>
+
+      {/* Image Selector Modal */}
+      {isImageSelectorOpen && (
+        <ImageSelectorModal
+          initialSelected={images}
+          onClose={() => setIsImageSelectorOpen(false)}
+          onSave={(selectedUrls) => {
+            setImages(selectedUrls)
+            setIsImageSelectorOpen(false)
+          }}
+        />
+      )}
     </div>
   )
 }
