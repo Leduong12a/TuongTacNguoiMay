@@ -15,7 +15,12 @@ import {
   X,
   FileText,
   Download,
-  ArrowLeft
+  ArrowLeft,
+  Mic,
+  MicOff,
+  Volume2,
+  VolumeX,
+  VideoOff
 } from 'lucide-react'
 
 interface Message {
@@ -169,6 +174,40 @@ export const Chat: React.FC = () => {
   const [messageSearchQuery, setMessageSearchQuery] = useState('')
   const [selectedSearchResultIndex, setSelectedSearchResultIndex] = useState(0)
   const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null)
+
+  // Call simulation states
+  const [activeCall, setActiveCall] = useState<{
+    type: 'audio' | 'video'
+    contactName: string
+    avatar: string
+    avatarBg: string
+    status: 'ringing' | 'connected'
+    seconds: number
+  } | null>(null)
+
+  const [isMuted, setIsMuted] = useState(false)
+  const [isSpeakerOn, setIsSpeakerOn] = useState(false)
+  const [isVideoOn, setIsVideoOn] = useState(false)
+
+  // Timer effect when connected
+  useEffect(() => {
+    let interval: any
+    if (activeCall && activeCall.status === 'connected') {
+      interval = setInterval(() => {
+        setActiveCall(prev => {
+          if (!prev) return null
+          return { ...prev, seconds: prev.seconds + 1 }
+        })
+      }, 1000)
+    }
+    return () => clearInterval(interval)
+  }, [activeCall?.status])
+
+  const formatTime = (totalSeconds: number) => {
+    const mins = Math.floor(totalSeconds / 60).toString().padStart(2, '0')
+    const secs = (totalSeconds % 60).toString().padStart(2, '0')
+    return `${mins}:${secs}`
+  }
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messageSearchInputRef = useRef<HTMLInputElement>(null)
@@ -650,14 +689,38 @@ export const Chat: React.FC = () => {
                 </div>
 
                 <button 
-                  onClick={() => alert(`Gọi điện thoại cho ${activeThread.name}`)}
+                  onClick={() => {
+                    setActiveCall({
+                      type: 'audio',
+                      contactName: activeThread.name,
+                      avatar: activeThread.avatar,
+                      avatarBg: activeThread.avatarBg,
+                      status: 'ringing',
+                      seconds: 0
+                    })
+                    setIsMuted(false)
+                    setIsSpeakerOn(false)
+                    setIsVideoOn(false)
+                  }}
                   className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 cursor-pointer focus:outline-none"
                   title="Bắt đầu cuộc gọi thoại"
                 >
                   <Phone className="w-5 h-5" />
                 </button>
                 <button 
-                  onClick={() => alert(`Gọi video cho ${activeThread.name}`)}
+                  onClick={() => {
+                    setActiveCall({
+                      type: 'video',
+                      contactName: activeThread.name,
+                      avatar: activeThread.avatar,
+                      avatarBg: activeThread.avatarBg,
+                      status: 'ringing',
+                      seconds: 0
+                    })
+                    setIsMuted(false)
+                    setIsSpeakerOn(false)
+                    setIsVideoOn(true)
+                  }}
                   className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 cursor-pointer focus:outline-none"
                   title="Bắt đầu cuộc gọi video"
                 >
@@ -900,6 +963,107 @@ export const Chat: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Call Modal Overlay matching user mockup */}
+      {activeCall && (
+        <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-md z-50 flex items-center justify-center animate-fadeIn">
+          <div className="w-[360px] bg-[#1a2232] rounded-3xl p-8 text-white shadow-2xl border border-white/5 flex flex-col items-center relative animate-scaleUp">
+            
+            {/* Top row */}
+            <div className="w-full flex justify-between items-center mb-6">
+              <button 
+                type="button"
+                onClick={() => setActiveCall(null)}
+                className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/70 hover:text-white transition-colors cursor-pointer"
+              >
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              <button 
+                type="button"
+                className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/70 hover:text-white transition-colors cursor-pointer"
+              >
+                <svg className="w-4 h-4 fill-none stroke-current" viewBox="0 0 24 24" strokeWidth="2">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <line x1="19" y1="8" x2="19" y2="14" />
+                  <line x1="22" y1="11" x2="16" y2="11" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Avatar & Ring */}
+            <div className="relative mb-6">
+              <div className="absolute inset-[-8px] rounded-full bg-blue-500/20 animate-ping" />
+              <div className={`w-24 h-24 rounded-full ${activeCall.avatarBg} text-white text-3xl font-bold flex items-center justify-center border-4 border-white/10 relative z-10 shadow-lg`}>
+                {activeCall.avatar}
+              </div>
+            </div>
+
+            {/* Contact Name & Status */}
+            <h3 className="text-[20px] font-bold tracking-wide mb-1.5">{activeCall.contactName}</h3>
+            <p className="text-[12.5px] text-white/50 font-semibold mb-8">
+              {activeCall.status === 'ringing' ? 'Đang đổ chuông...' : `Đã kết nối • ${formatTime(activeCall.seconds)}`}
+            </p>
+
+            {/* Controls row */}
+            <div className="flex gap-4 mb-9">
+              <button
+                type="button"
+                onClick={() => setIsMuted(!isMuted)}
+                className={`w-11 h-11 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+                  isMuted ? 'bg-red-500/25 border border-red-500 text-red-500' : 'bg-white/5 hover:bg-white/10 text-white'
+                }`}
+                title="Tắt tiếng"
+              >
+                {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsSpeakerOn(!isSpeakerOn)}
+                className={`w-11 h-11 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+                  isSpeakerOn ? 'bg-blue-500/25 border border-blue-500 text-blue-400' : 'bg-white/5 hover:bg-white/10 text-white'
+                }`}
+                title="Loa ngoài"
+              >
+                {isSpeakerOn ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5 text-white/70" />}
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsVideoOn(!isVideoOn)}
+                className={`w-11 h-11 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+                  isVideoOn ? 'bg-green-500/25 border border-green-500 text-green-400' : 'bg-white/5 hover:bg-white/10 text-white'
+                }`}
+                title="Camera"
+              >
+                {isVideoOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
+              </button>
+            </div>
+
+            {/* Accept / Decline buttons */}
+            <div className="flex gap-8">
+              {activeCall.status === 'ringing' && (
+                <button
+                  type="button"
+                  onClick={() => setActiveCall(prev => prev ? { ...prev, status: 'connected' } : null)}
+                  className="w-14 h-14 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center text-white shadow-lg shadow-green-950/40 active:scale-95 transition-all cursor-pointer"
+                  title="Trả lời"
+                >
+                  <Phone className="w-6 h-6 fill-current" />
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setActiveCall(null)}
+                className="w-14 h-14 rounded-full bg-red-500 hover:bg-red-650 flex items-center justify-center text-white shadow-lg shadow-red-950/40 active:scale-95 transition-all cursor-pointer"
+                title="Gác máy"
+              >
+                <Phone className="w-6 h-6 fill-current transform rotate-[135deg]" />
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
 
     </div>
   )
