@@ -4,6 +4,7 @@ import { Menu, X, User, Camera, Edit3 } from 'lucide-react'
 import { CreateStory } from './story/CreateStory'
 import { CreatePost } from './post/CreatePost'
 import { Search } from './search/Search'
+import { Profile } from './profile/Profile'
 
 interface DashboardProps {
   onLogout: () => void
@@ -94,7 +95,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       {/* Main content display section */}
       <main className="flex-1 flex flex-col min-w-0 pt-14 md:pt-0 bg-[#F7F9FC] relative">
         {activeTab === 'search' && <Search onClose={() => setActiveTab('profile')} />}
-        {activeTab !== 'search' && (
+        {activeTab === 'profile' && <Profile />}
+        {activeTab !== 'search' && activeTab !== 'profile' && (
           <div className="flex-1 flex items-center justify-center text-slate-400 font-semibold text-sm">
             {/* Content area */}
           </div>
