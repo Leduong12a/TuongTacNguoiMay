@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Sidebar } from './Sidebar'
 import { Menu, X, User, Camera, Edit3 } from 'lucide-react'
 import { CreateStory } from './story/CreateStory'
@@ -8,14 +8,19 @@ import { Profile } from './profile/Profile'
 
 interface DashboardProps {
   onLogout: () => void
+  initialTab?: string
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
-  const [activeTab, setActiveTab] = useState<string>('profile')
+export const Dashboard: React.FC<DashboardProps> = ({ onLogout, initialTab = 'messages' }) => {
+  const [activeTab, setActiveTab] = useState<string>(initialTab)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false)
   const [isCreateStoryOpen, setIsCreateStoryOpen] = useState<boolean>(false)
   const [isCreatePostOpen, setIsCreatePostOpen] = useState<boolean>(false)
+
+  useEffect(() => {
+    setActiveTab(initialTab)
+  }, [initialTab])
 
 
   return (
@@ -94,11 +99,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
       {/* Main content display section */}
       <main className="flex-1 flex flex-col min-w-0 pt-14 md:pt-0 bg-[#F7F9FC] relative">
-        {activeTab === 'search' && <Search onClose={() => setActiveTab('profile')} />}
+        {activeTab === 'search' && <Search onClose={() => setActiveTab('messages')} />}
         {activeTab === 'profile' && <Profile />}
-        {activeTab !== 'search' && activeTab !== 'profile' && (
+        {activeTab === 'messages' || (activeTab !== 'search' && activeTab !== 'profile') && (
           <div className="flex-1 flex items-center justify-center text-slate-400 font-semibold text-sm">
-            {/* Content area */}
+            {/* Messages/Chat content area - placeholder */}
           </div>
         )}
       </main>

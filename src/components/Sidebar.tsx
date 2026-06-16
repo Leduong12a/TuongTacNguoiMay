@@ -1,5 +1,6 @@
 import React from 'react'
 import { MessageSquare, Users, User, Phone, Search, Settings, LogOut } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 interface SidebarProps {
   activeTab: string
@@ -14,6 +15,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onLogout,
   onProfileClick,
 }) => {
+  const navigate = useNavigate()
+  
   const menuItems = [
     { id: 'chat', label: 'Trò chuyện', icon: MessageSquare },
     { id: 'contacts', label: 'Danh bạ', icon: Users },
@@ -22,6 +25,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'search', label: 'Tìm Kiếm', icon: Search },
     { id: 'settings', label: 'Cài đặt', icon: Settings },
   ]
+
+  const handleMenuClick = (id: string) => {
+    if (id === 'profile') {
+      navigate('/profile')
+    } else if (id === 'chat') {
+      navigate('/dashboard')
+    } else {
+      onTabChange(id)
+    }
+  }
+
+  const getActiveTab = () => {
+    if (activeTab === 'chat') return 'chat'
+    if (activeTab === 'messages') return 'chat'
+    return activeTab
+  }
 
   return (
     <aside className="w-[280px] h-screen bg-[#F8F9FA] border-r border-slate-200 flex flex-col justify-between select-none">
@@ -50,13 +69,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <nav className="flex flex-col">
           {menuItems.map((item) => {
             const Icon = item.icon
-            const isActive = activeTab === item.id
+            const currentActiveTab = getActiveTab()
+            const isActive = currentActiveTab === item.id
 
             return (
               <button
                 key={item.id}
                 type="button"
-                onClick={() => onTabChange(item.id)}
+                onClick={() => handleMenuClick(item.id)}
                 className={`flex items-center gap-3.5 px-6 py-3 w-full text-left text-[15px] font-semibold transition-all duration-200 relative cursor-pointer group focus:outline-none ${
                   isActive
                     ? 'bg-[#E8F1FF] text-[#0056C6] after:content-[\'\'] after:absolute after:right-0 after:top-0 after:bottom-0 after:w-[3.5px] after:bg-[#0056C6]'
