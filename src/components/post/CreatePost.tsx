@@ -19,6 +19,7 @@ interface CreatePostProps {
     tags: string[]
     location: string | null
   }) => void
+  authorName?: string
 }
 
 const mockPostImages = [
@@ -26,7 +27,7 @@ const mockPostImages = [
   'https://images.unsplash.com/photo-1496181130204-755241524eab?w=500&auto=format&fit=crop'  // laptop
 ]
 
-export const CreatePost: React.FC<CreatePostProps> = ({ onClose, onPublish }) => {
+export const CreatePost: React.FC<CreatePostProps> = ({ onClose, onPublish, authorName = 'Phùng Văn Duy' }) => {
   const [text, setText] = useState<string>('Bạn đang nghĩ gì?')
   const [privacy, setPrivacy] = useState<string>('public')
   const [images, setImages] = useState<string[]>(mockPostImages)
@@ -129,7 +130,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onClose, onPublish }) =>
             {/* Name and Privacy selection */}
             <div className="flex flex-col items-start gap-1">
               <div className="flex flex-wrap items-center gap-1 text-[14.5px] font-bold text-slate-800">
-                <span>Lê Minh</span>
+                <span>{authorName}</span>
                 {feeling && (
                   <span className="text-slate-500 font-normal">
                     đang cảm thấy <span className="font-semibold text-slate-700">{feeling.emoji} {feeling.label}</span>

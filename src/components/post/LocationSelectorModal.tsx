@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { X, Search, MapPin, Map, RefreshCw, Trash2 } from 'lucide-react'
+import { X, Search, MapPin, Trash2 } from 'lucide-react'
 
 interface LocationItem {
   id: string
