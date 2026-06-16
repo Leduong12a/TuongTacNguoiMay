@@ -124,14 +124,7 @@ export const CreateStory: React.FC<CreateStoryProps> = ({ onClose, onShare }) =>
           
           {/* Header */}
           <div className="flex flex-col shrink-0">
-            <div className="h-16 px-5 flex items-center gap-4 border-b border-slate-100">
-              <button
-                onClick={onClose}
-                className="p-1.5 hover:bg-slate-100 rounded-full text-slate-500 hover:text-slate-700 transition-colors cursor-pointer focus:outline-none"
-                title="Đóng"
-              >
-                <X className="w-5 h-5" />
-              </button>
+            <div className="h-16 px-5 flex items-center border-b border-slate-100">
               <h2 className="text-[17px] font-bold text-slate-800">Tạo tin</h2>
             </div>
           </div>
@@ -290,12 +283,15 @@ export const CreateStory: React.FC<CreateStoryProps> = ({ onClose, onShare }) =>
 
         </div>
 
-        {/* Right panel - Preview canvas */}
         <div className="flex-1 flex flex-col relative h-full bg-[#E9EBEE]">
-          {/* Zoom/Search icon in top-right */}
+          {/* Close button in top-right (where search icon was) */}
           <div className="absolute top-5 right-5 z-20">
-            <button className="p-2 bg-white hover:bg-slate-50 rounded-full shadow-md text-slate-500 hover:text-slate-800 transition-colors cursor-pointer">
-              <Search className="w-4.5 h-4.5" />
+            <button
+              onClick={onClose}
+              className="p-2 bg-white hover:bg-slate-50 rounded-full shadow-md text-slate-550 hover:text-slate-800 transition-colors cursor-pointer focus:outline-none"
+              title="Đóng"
+            >
+              <X className="w-4.5 h-4.5" />
             </button>
           </div>
 
