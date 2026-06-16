@@ -4,6 +4,7 @@ import { PostPrivacySelector } from './PostPrivacySelector'
 import { MediaUpload } from './MediaUpload'
 import { PostMusicPlayer } from './PostMusicPlayer'
 import { ImageSelectorModal } from './ImageSelectorModal'
+import { TagFriendsModal } from './TagFriendsModal'
 
 interface CreatePostProps {
   onClose: () => void
@@ -27,6 +28,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onClose, onPublish }) =>
   const [privacy, setPrivacy] = useState<string>('public')
   const [images, setImages] = useState<string[]>(mockPostImages)
   const [isImageSelectorOpen, setIsImageSelectorOpen] = useState<boolean>(false)
+  const [isTagFriendsOpen, setIsTagFriendsOpen] = useState<boolean>(false)
   const [music, setMusic] = useState<{ title: string; artist: string } | null>({
     title: 'Lofi Chill Beats',
     artist: 'Various Artists'
@@ -34,7 +36,30 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onClose, onPublish }) =>
   
   // Custom metadata states
   const [location, setLocation] = useState<string | null>(null)
-  const [tags, setTags] = useState<string[]>([])
+  const [tags, setTags] = useState<string[]>(['Nguyễn Văn A', 'Lê Văn C'])
+
+  const renderTaggedFriends = () => {
+    if (tags.length === 0) return null
+    if (tags.length === 1) {
+      return (
+        <span className="text-slate-500 font-normal">
+          cùng với <span className="font-semibold text-slate-700">{tags[0]}</span>
+        </span>
+      )
+    }
+    if (tags.length === 2) {
+      return (
+        <span className="text-slate-500 font-normal">
+          cùng với <span className="font-semibold text-slate-700">{tags[0]}</span> và <span className="font-semibold text-slate-700">{tags[1]}</span>
+        </span>
+      )
+    }
+    return (
+      <span className="text-slate-500 font-normal">
+        cùng với <span className="font-semibold text-slate-700">{tags[0]}</span> và <span className="font-semibold text-slate-700">{tags.length - 1} người khác</span>
+      </span>
+    )
+  }
 
   const handlePublish = () => {
     onPublish({
@@ -61,11 +86,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onClose, onPublish }) =>
   }
 
   const handleToggleTags = () => {
-    if (tags.length > 0) {
-      setTags([])
-    } else {
-      setTags(['Lê Minh'])
-    }
+    setIsTagFriendsOpen(true)
   }
 
   const handleAddEmoji = () => {
@@ -110,11 +131,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onClose, onPublish }) =>
             <div className="flex flex-col items-start gap-1">
               <div className="flex flex-wrap items-center gap-1 text-[14.5px] font-bold text-slate-800">
                 <span>Lê Minh</span>
-                {tags.length > 0 && (
-                  <span className="text-slate-550 font-normal">
-                    cùng với <span className="font-semibold text-slate-700">{tags.join(', ')}</span>
-                  </span>
-                )}
+                {renderTaggedFriends()}
                 {location && (
                   <span className="text-slate-550 font-normal">
                     tại <span className="font-semibold text-slate-700">{location}</span>
@@ -247,6 +264,18 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onClose, onPublish }) =>
           onSave={(selectedUrls) => {
             setImages(selectedUrls)
             setIsImageSelectorOpen(false)
+          }}
+        />
+      )}
+
+      {/* Tag Friends Modal */}
+      {isTagFriendsOpen && (
+        <TagFriendsModal
+          initialSelected={tags}
+          onClose={() => setIsTagFriendsOpen(false)}
+          onSave={(selectedNames) => {
+            setTags(selectedNames)
+            setIsTagFriendsOpen(false)
           }}
         />
       )}
