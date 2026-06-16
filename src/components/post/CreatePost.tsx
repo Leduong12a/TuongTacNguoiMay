@@ -5,6 +5,7 @@ import { MediaUpload } from './MediaUpload'
 import { PostMusicPlayer } from './PostMusicPlayer'
 import { ImageSelectorModal } from './ImageSelectorModal'
 import { TagFriendsModal } from './TagFriendsModal'
+import { LocationSelectorModal } from './LocationSelectorModal'
 
 interface CreatePostProps {
   onClose: () => void
@@ -29,6 +30,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onClose, onPublish }) =>
   const [images, setImages] = useState<string[]>(mockPostImages)
   const [isImageSelectorOpen, setIsImageSelectorOpen] = useState<boolean>(false)
   const [isTagFriendsOpen, setIsTagFriendsOpen] = useState<boolean>(false)
+  const [isLocationSelectorOpen, setIsLocationSelectorOpen] = useState<boolean>(false)
   const [music, setMusic] = useState<{ title: string; artist: string } | null>({
     title: 'Lofi Chill Beats',
     artist: 'Various Artists'
@@ -78,11 +80,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onClose, onPublish }) =>
   }
 
   const handleToggleLocation = () => {
-    if (location) {
-      setLocation(null)
-    } else {
-      setLocation('Hà Nội')
-    }
+    setIsLocationSelectorOpen(true)
   }
 
   const handleToggleTags = () => {
@@ -276,6 +274,18 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onClose, onPublish }) =>
           onSave={(selectedNames) => {
             setTags(selectedNames)
             setIsTagFriendsOpen(false)
+          }}
+        />
+      )}
+
+      {/* Location Selector Modal */}
+      {isLocationSelectorOpen && (
+        <LocationSelectorModal
+          currentLocation={location}
+          onClose={() => setIsLocationSelectorOpen(false)}
+          onSelect={(locationName) => {
+            setLocation(locationName)
+            setIsLocationSelectorOpen(false)
           }}
         />
       )}
