@@ -9,6 +9,8 @@ import { Chat } from './Chat'
 import { Calls } from './Calls'
 import { Profile } from './profile/Profile'
 import { Settings } from './settings/Settings'
+import { SidebarProvider } from '@/components/ui/sidebar'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 interface DashboardProps {
   onLogout: () => void
@@ -32,7 +34,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, initialTab = 'ch
 
 
   return (
-    <div className="flex-1 flex h-screen overflow-hidden bg-white select-none relative">
+    <SidebarProvider>
+      <TooltipProvider>
+        <div className="flex-1 flex h-screen overflow-hidden bg-white select-none relative w-full">
       
       {/* Mobile Top Header (hidden on Desktop) */}
       <div className="md:hidden h-14 bg-white border-b border-slate-200 w-full fixed top-0 left-0 right-0 px-4 flex items-center justify-between z-40">
@@ -202,5 +206,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, initialTab = 'ch
       )}
 
     </div>
+      </TooltipProvider>
+    </SidebarProvider>
   )
 }
