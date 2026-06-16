@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { cn } from '@/lib/utils'
 import { 
   Search, 
   Phone, 
@@ -214,8 +215,7 @@ export const Chat: React.FC = () => {
 
   const activeThread = threads.find(t => t.id === activeThreadId)
 
-  // Toggle middle column based on thread selection and message search state
-  const shouldShowMiddleColumn = activeThreadId === null || isSearchingMessages
+
 
   // Scroll to bottom when messages change or thread changes
   useEffect(() => {
@@ -350,8 +350,10 @@ export const Chat: React.FC = () => {
       {/* ======================================================== */}
       {/* COLUMN 1 (MIDDLE): Conversations List OR Search Messages */}
       {/* ======================================================== */}
-      {shouldShowMiddleColumn && (
-        <div className="w-[350px] shrink-0 bg-white border-r border-slate-200 flex flex-col h-full z-10 transition-all duration-300">
+      <div className={cn(
+        "w-[350px] shrink-0 bg-white border-r border-slate-200 flex flex-col h-full z-10 transition-all duration-300",
+        activeThreadId !== null && "hidden md:flex"
+      )}>
           
           {isSearchingMessages ? (
             /* ================= MESSAGE SEARCH PANEL ================= */
@@ -616,34 +618,34 @@ export const Chat: React.FC = () => {
             </>
           )}
 
-        </div>
-      )}
+      </div>
 
       {/* ======================================================== */}
       {/* COLUMN 2 (RIGHT): Welcome Carousel OR Message Window     */}
       {/* ======================================================== */}
-      <div className="flex-1 flex flex-col h-full bg-[#F8F9FA] relative">
+      <div className={cn(
+        "flex-1 flex flex-col h-full bg-[#F8F9FA] relative",
+        activeThreadId === null && "hidden md:flex"
+      )}>
         {activeThread ? (
           <>
             {/* Thread Header */}
             <div className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0 z-10 shadow-sm/50">
               <div className="flex items-center gap-3.5">
-                {/* Back button shown when middle column is hidden */}
-                {!shouldShowMiddleColumn && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveThreadId(null)
-                      setIsSearchingMessages(false)
-                      setMessageSearchQuery('')
-                      setHighlightedMessageId(null)
-                    }}
-                    className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-[#0056C6] cursor-pointer focus:outline-none mr-2 transition-all active:scale-90"
-                    title="Quay lại danh sách trò chuyện"
-                  >
-                    <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
-                  </button>
-                )}
+                {/* Back button shown on mobile screens */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveThreadId(null)
+                    setIsSearchingMessages(false)
+                    setMessageSearchQuery('')
+                    setHighlightedMessageId(null)
+                  }}
+                  className="md:hidden p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-[#0056C6] cursor-pointer focus:outline-none mr-2 transition-all active:scale-90"
+                  title="Quay lại danh sách trò chuyện"
+                >
+                  <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
+                </button>
 
                 <div className={`w-10.5 h-10.5 rounded-xl ${activeThread.avatarBg} text-white font-bold text-[14.5px] flex items-center justify-center shadow-sm shrink-0`}>
                   {activeThread.avatar}
@@ -658,35 +660,7 @@ export const Chat: React.FC = () => {
 
               {/* Header actions (Search input in header + call icons) */}
               <div className="flex items-center gap-4">
-                {/* Custom Search Box in Header matching Zalo PC mockup */}
-                <div className="relative flex items-center bg-slate-100 border border-transparent rounded-full px-3 py-1.5 focus-within:bg-white focus-within:border-slate-200 w-48 transition-all shrink-0">
-                  <Search className="w-3.5 h-3.5 text-slate-400 mr-2" />
-                  <input
-                    type="text"
-                    placeholder="Tìm kiếm tin nhắn..."
-                    onClick={() => {
-                      setIsSearchingMessages(true)
-                    }}
-                    value={messageSearchQuery}
-                    onChange={(e) => {
-                      setIsSearchingMessages(true)
-                      setMessageSearchQuery(e.target.value)
-                      setSelectedSearchResultIndex(0)
-                    }}
-                    className="w-full text-[11.5px] bg-transparent border-none outline-none text-slate-800 placeholder-slate-400 p-0 focus:ring-0"
-                  />
-                  {messageSearchQuery.trim() && (
-                    <button 
-                      onClick={() => {
-                        setMessageSearchQuery('')
-                        setHighlightedMessageId(null)
-                      }}
-                      className="text-slate-400 hover:text-slate-650"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  )}
-                </div>
+
 
                 <button 
                   onClick={() => {

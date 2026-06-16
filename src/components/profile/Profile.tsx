@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Pencil, ChevronDown, HelpCircle, Check, X } from 'lucide-react'
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Typography } from "@/components/ui/typography"
 
 interface ProfileData {
   name: string
@@ -73,13 +77,15 @@ export const Profile: React.FC = () => {
           <div className="w-5 h-5 rounded-full bg-[#EAF7EE] border border-[#A2E0B8] flex items-center justify-center text-[#2E7D32] shrink-0">
             <Check className="w-3.5 h-3.5 stroke-[2.5]" />
           </div>
-          <span className="text-xs font-bold text-slate-800">Cập nhật thành công</span>
-          <button 
+          <Typography variant="small" className="font-bold text-slate-800">Cập nhật thành công</Typography>
+          <Button 
+            variant="ghost"
+            size="icon-xs"
             onClick={handleToastClose}
-            className="p-0.5 hover:bg-slate-100 rounded text-slate-400 hover:text-slate-600 transition-colors ml-2"
+            className="p-0.5 text-slate-400 hover:text-slate-600 transition-colors ml-2"
           >
             <X className="w-3.5 h-3.5" />
-          </button>
+          </Button>
         </div>
       )}
 
@@ -87,8 +93,12 @@ export const Profile: React.FC = () => {
         
         {/* Header Section */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-[#0f2942] mb-1">Hồ sơ cá nhân</h1>
-          <p className="text-slate-500 text-xs font-medium">Quản lý thông tin cá nhân và cài đặt bảo mật của bạn.</p>
+          <Typography variant="h1" className="text-2xl font-bold text-[#0f2942] mb-1 border-none shadow-none">
+            Hồ sơ cá nhân
+          </Typography>
+          <Typography variant="muted" className="text-slate-500 text-xs font-medium">
+            Quản lý thông tin cá nhân và cài đặt bảo mật của bạn.
+          </Typography>
         </div>
 
         {/* Main Columns Container */}
@@ -97,7 +107,7 @@ export const Profile: React.FC = () => {
           {/* Left Column: Avatar */}
           <div className="flex flex-col items-center shrink-0 w-full md:w-44">
             <div className="relative">
-              {/* Square avatar placeholder matching image 2 */}
+              {/* Square avatar placeholder */}
               <div className="w-40 h-40 bg-[#d4d8e0] rounded-xl flex items-center justify-center overflow-hidden shadow-sm border border-slate-200">
                 <svg
                   className="w-28 h-28 text-slate-500 mt-6"
@@ -108,61 +118,66 @@ export const Profile: React.FC = () => {
                 </svg>
               </div>
               {/* Blue edit pencil button in bottom-right */}
-              <button
+              <Button
+                variant="default"
+                size="icon-xs"
                 onClick={handleChangeAvatar}
-                className="absolute bottom-1 right-1 bg-[#0056C6] hover:bg-blue-700 text-white p-1.5 rounded-full shadow border-2 border-white flex items-center justify-center cursor-pointer transition-all active:scale-90"
+                className="absolute bottom-1 right-1 bg-[#0056C6] hover:bg-blue-700 text-white rounded-full shadow border-2 border-white flex items-center justify-center cursor-pointer transition-all active:scale-90"
                 title="Thay đổi ảnh"
               >
-                <Pencil className="w-3.5 h-3.5" />
-              </button>
+                <Pencil className="w-3 h-3" />
+              </Button>
             </div>
             {/* Clickable text link */}
-            <button
+            <Button
+              variant="link"
               onClick={handleChangeAvatar}
-              className="mt-3 text-xs font-bold text-blue-600 hover:text-blue-700 hover:underline transition-colors"
+              className="mt-3 text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors"
             >
               Thay đổi ảnh
-            </button>
+            </Button>
           </div>
 
           {/* Right Column: Forms */}
           <div className="flex-1 flex flex-col gap-5 w-full">
             
             {/* Card: Thông tin cơ bản */}
-            <div className="bg-white border border-slate-200 rounded-lg p-5 shadow-sm">
-              <h3 className="text-sm font-bold text-slate-800 mb-5 pb-2 border-b border-slate-100">Thông tin cơ bản</h3>
+            <Card className="bg-white border border-slate-200 rounded-lg p-5 shadow-sm">
+              <CardHeader className="p-0 pb-2 border-b border-slate-100 mb-5">
+                <CardTitle className="text-sm font-bold text-slate-800">Thông tin cơ bản</CardTitle>
+              </CardHeader>
               
-              <div className="space-y-4">
+              <CardContent className="p-0 space-y-4">
                 {/* Họ và tên */}
                 <div>
                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Họ và tên</label>
-                  <input
+                  <Input
                     type="text"
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded text-slate-700 text-xs focus:outline-none focus:border-blue-500 transition-all"
+                    className="h-8 text-xs text-slate-700 bg-white border border-slate-300 rounded"
                   />
                 </div>
 
                 {/* Địa chỉ email */}
                 <div>
                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Địa chỉ email</label>
-                  <input
+                  <Input
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded text-slate-700 text-xs focus:outline-none focus:border-blue-500 transition-all"
+                    className="h-8 text-xs text-slate-700 bg-white border border-slate-300 rounded"
                   />
                 </div>
 
                 {/* Số điện thoại */}
                 <div>
                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Số điện thoại</label>
-                  <input
+                  <Input
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded text-slate-700 text-xs focus:outline-none focus:border-blue-500 transition-all"
+                    className="h-8 text-xs text-slate-700 bg-white border border-slate-300 rounded"
                   />
                 </div>
 
@@ -175,7 +190,7 @@ export const Profile: React.FC = () => {
                       <select
                         value={formData.status}
                         onChange={(e) => handleInputChange('status', e.target.value)}
-                        className="w-full px-3 py-1.5 border border-slate-300 rounded bg-white text-slate-700 text-xs focus:outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer pr-8"
+                        className="w-full px-3 h-8 border border-slate-300 rounded bg-white text-slate-700 text-xs focus:outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer pr-8"
                       >
                         <option value="Trực tuyến">Trực tuyến</option>
                         <option value="Bận">Bận</option>
@@ -190,43 +205,48 @@ export const Profile: React.FC = () => {
                   {/* Ghi chú */}
                   <div>
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Ghi chú</label>
-                    <input
+                    <Input
                       type="text"
                       value={formData.note}
                       onChange={(e) => handleInputChange('note', e.target.value)}
-                      className="w-full px-3 py-1.5 border border-slate-300 rounded text-slate-700 text-xs focus:outline-none focus:border-blue-500 transition-all"
+                      className="h-8 text-xs text-slate-700 bg-white border border-slate-300 rounded"
                     />
                   </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
             {/* Card: Bảo mật */}
-            <div className="bg-white border border-slate-200 rounded-lg p-5 shadow-sm">
-              <h3 className="text-sm font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100">Bảo mật</h3>
+            <Card className="bg-white border border-slate-200 rounded-lg p-5 shadow-sm">
+              <CardHeader className="p-0 pb-2 border-b border-slate-100 mb-4">
+                <CardTitle className="text-sm font-bold text-slate-800">Bảo mật</CardTitle>
+              </CardHeader>
               
-              <div className="flex items-center justify-between">
+              <CardContent className="p-0 flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-bold text-slate-800">Mật khẩu</p>
-                  <p className="text-[10px] text-slate-400 mt-0.5">Cập nhật lần cuối: 2 tháng trước</p>
+                  <Typography variant="small" className="font-bold text-slate-800">Mật khẩu</Typography>
+                  <Typography variant="muted" className="text-[10px] text-slate-400 mt-0.5 block">Cập nhật lần cuối: 2 tháng trước</Typography>
                 </div>
-                <button
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => alert('Chức năng đổi mật khẩu')}
-                  className="px-4 py-1.5 border border-slate-300 hover:border-slate-400 text-slate-700 hover:bg-slate-50 rounded font-bold text-xs transition-all cursor-pointer"
+                  className="font-bold border border-slate-300 hover:border-slate-400 text-slate-700 hover:bg-slate-50 transition-all cursor-pointer"
                 >
                   Đổi mật khẩu
-                </button>
-              </div>
-            </div>
+                </Button>
+              </CardContent>
+            </Card>
 
             {/* Save Button Row */}
             <div className="flex justify-end mt-2">
-              <button
+              <Button
+                variant="default"
                 onClick={handleSaveClick}
-                className="px-6 py-2 bg-[#0056C6] hover:bg-blue-700 text-white rounded font-bold text-xs transition-all active:scale-97 cursor-pointer shadow-sm"
+                className="bg-[#0056C6] hover:bg-blue-700 text-white rounded font-bold px-6 py-2 transition-all active:scale-97 cursor-pointer shadow-sm"
               >
                 Lưu thay đổi
-              </button>
+              </Button>
             </div>
 
           </div>
@@ -237,33 +257,35 @@ export const Profile: React.FC = () => {
       {/* Confirmation Modal */}
       {showConfirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-[1px]">
-          <div className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl border border-slate-150 z-50">
+          <Card className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl border border-slate-150 z-50">
             <div className="text-center">
               {/* Question Icon Circle */}
               <div className="w-14 h-14 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center mx-auto mb-4 text-[#0056C6]">
                 <HelpCircle className="w-8 h-8 stroke-[2.5]" />
               </div>
               
-              <h3 className="text-xs font-bold text-slate-800 mb-6 px-2 leading-relaxed">
+              <Typography variant="h4" className="text-xs font-bold text-slate-800 mb-6 px-2 leading-relaxed">
                 Bạn có xác nhận thay đổi hồ sơ không?
-              </h3>
+              </Typography>
 
               <div className="flex gap-3">
-                <button
+                <Button
+                  variant="outline"
                   onClick={handleCancelSave}
-                  className="flex-1 px-4 py-2 border border-slate-200 text-slate-600 rounded hover:bg-slate-50 transition-colors cursor-pointer font-bold text-xs"
+                  className="flex-1 border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer font-bold text-xs"
                 >
                   Không
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="default"
                   onClick={handleConfirmSave}
-                  className="flex-1 px-4 py-2 bg-[#0056C6] hover:bg-blue-700 text-white rounded transition-colors cursor-pointer font-bold text-xs"
+                  className="flex-1 bg-[#0056C6] hover:bg-blue-700 text-white transition-colors cursor-pointer font-bold text-xs"
                 >
                   Có
-                </button>
+                </Button>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       )}
 
