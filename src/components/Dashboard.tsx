@@ -1,23 +1,42 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Sidebar } from './Sidebar'
 import { Menu, X, User, Camera, Edit3 } from 'lucide-react'
 import { CreateStory } from './story/CreateStory'
 import { CreatePost } from './post/CreatePost'
+import { SearchFriend } from './SearchFriend'
+import { Contacts } from './Contacts'
+import { Chat } from './Chat'
+import { Calls } from './Calls'
+import { Profile } from './profile/Profile'
+import { Settings } from './settings/Settings'
+import { SidebarProvider } from '@/components/ui/sidebar'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 interface DashboardProps {
   onLogout: () => void
+  initialTab?: string
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
-  const [activeTab, setActiveTab] = useState<string>('profile')
+export const Dashboard: React.FC<DashboardProps> = ({ onLogout, initialTab = 'chat' }) => {
+  const [activeTab, setActiveTab] = useState<string>(initialTab)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false)
   const [isCreateStoryOpen, setIsCreateStoryOpen] = useState<boolean>(false)
   const [isCreatePostOpen, setIsCreatePostOpen] = useState<boolean>(false)
 
+  useEffect(() => {
+    setActiveTab(initialTab)
+  }, [initialTab])
+
+  useEffect(() => {
+    setIsMobileSidebarOpen(false)
+  }, [activeTab])
+
 
   return (
-    <div className="flex-1 flex h-screen overflow-hidden bg-white select-none relative">
+    <SidebarProvider>
+      <TooltipProvider>
+        <div className="flex-1 flex h-screen overflow-hidden bg-white select-none relative w-full">
       
       {/* Mobile Top Header (hidden on Desktop) */}
       <div className="md:hidden h-14 bg-white border-b border-slate-200 w-full fixed top-0 left-0 right-0 px-4 flex items-center justify-between z-40">
@@ -37,7 +56,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2Z" />
             </svg>
           </div>
-          <span className="text-[17px] font-bold text-[#0056C6]">ChatApp</span>
+          <span className="text-[17px] font-bold text-[#0056C6]">Messenger</span>
         </div>
         <div className="w-9 h-9 rounded-xl bg-slate-200 flex items-center justify-center text-slate-500 shadow-inner">
           <User className="w-4.5 h-4.5" />
@@ -48,7 +67,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       <div className="hidden md:flex shrink-0">
         <Sidebar 
           activeTab={activeTab} 
-          onTabChange={setActiveTab} 
           onLogout={onLogout} 
           onProfileClick={() => setIsCreateModalOpen(true)}
         />
@@ -80,21 +98,30 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
           <Sidebar 
             activeTab={activeTab} 
-            onTabChange={(tab) => {
-              setActiveTab(tab)
-              setIsMobileSidebarOpen(false)
-            }} 
             onLogout={onLogout} 
             onProfileClick={() => setIsCreateModalOpen(true)}
           />
         </div>
       </div>
 
-      {/* Main content display section (Left empty as requested) */}
-      <main className="flex-1 flex flex-col min-w-0 pt-14 md:pt-0 bg-[#F7F9FC] relative">
-        <div className="flex-1 flex items-center justify-center text-slate-400 font-semibold text-sm">
-          {/* Nội dung tab {activeTab} trống */}
-        </div>
+      <main className="flex-1 flex flex-col min-w-0 pt-14 md:pt-0 bg-[#F7F9FC] relative overflow-hidden">
+        {activeTab === 'chat' ? (
+          <Chat />
+        ) : activeTab === 'contacts' ? (
+          <Contacts />
+        ) : activeTab === 'calls' ? (
+          <Calls />
+        ) : activeTab === 'search' ? (
+          <SearchFriend />
+        ) : activeTab === 'profile' ? (
+          <Profile />
+        ) : activeTab === 'settings' ? (
+          <Settings />
+        ) : (
+          <div className="flex-1 flex items-center justify-center text-slate-400 font-semibold text-sm">
+            {/* Messages/Chat content area - placeholder */}
+          </div>
+        )}
       </main>
 
       {/* Create Modal */}
@@ -179,5 +206,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       )}
 
     </div>
+      </TooltipProvider>
+    </SidebarProvider>
   )
 }

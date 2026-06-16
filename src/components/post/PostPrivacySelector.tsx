@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Globe, Users, Lock, UserPlus, ChevronDown, Check } from 'lucide-react'
+import { Globe, Users, Lock, UserPlus, ChevronDown } from 'lucide-react'
 
 export interface PrivacyOption {
   id: string

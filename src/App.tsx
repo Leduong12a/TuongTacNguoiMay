@@ -11,7 +11,7 @@ function AppContent() {
   const location = useLocation()
 
   const handleLoginSuccess = (_emailOrPhone: string) => {
-    navigate('/dashboard')
+    navigate('/chat')
   }
 
   const handleForgotPasswordSuccess = (_emailOrPhone: string) => {
@@ -32,7 +32,7 @@ function AppContent() {
     navigate('/')
   }
 
-  const isDashboard = location.pathname === '/dashboard'
+  const isDashboard = ['/chat', '/contacts', '/profile', '/calls', '/search', '/settings'].includes(location.pathname)
 
   return (
     <div className={isDashboard ? "w-full h-screen bg-white" : "flex-1 flex flex-col justify-center items-center px-4 py-12 sm:px-6 lg:px-8 bg-[#F7F9FC]"}>
@@ -94,9 +94,55 @@ function AppContent() {
           }
         />
         <Route
-          path="/dashboard"
+          path="/chat"
           element={
             <Dashboard
+              initialTab="chat"
+              onLogout={() => navigate('/')}
+            />
+          }
+        />
+        <Route
+          path="/contacts"
+          element={
+            <Dashboard
+              initialTab="contacts"
+              onLogout={() => navigate('/')}
+            />
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <Dashboard
+              initialTab="profile"
+              onLogout={() => navigate('/')}
+            />
+          }
+        />
+        <Route
+          path="/calls"
+          element={
+            <Dashboard
+              initialTab="calls"
+              onLogout={() => navigate('/')}
+            />
+          }
+        />
+        <Route
+          path="/search"
+          element={
+            <Dashboard
+              initialTab="search"
+              onLogout={() => navigate('/')}
+            />
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <Dashboard
+              initialTab="settings"
               onLogout={() => navigate('/')}
             />
           }
