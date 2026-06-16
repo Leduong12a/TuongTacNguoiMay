@@ -53,7 +53,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </svg>
           </div>
           <span className="text-[20px] font-bold text-[#0056C6] tracking-tight">
-            Messenger
+            ChatApp
           </span>
         </div>
 
@@ -89,32 +89,36 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Footer User Profile section */}
       <div className="flex flex-col">
-        {/* Logout button */}
-        <button
-          type="button"
-          onClick={onLogout}
-          className="flex items-center gap-3.5 px-6 py-3.5 text-left text-[14px] font-semibold text-red-500 hover:bg-red-50 transition-colors duration-200 cursor-pointer focus:outline-none border-t border-slate-200/50"
-        >
-          <LogOut className="w-5 h-5 text-red-500" />
-          <span>Đăng xuất</span>
-        </button>
-
-        {/* Profile Details */}
-        <div 
-          onClick={onProfileClick}
-          className="border-t border-slate-200 p-5 flex items-center gap-3 bg-slate-50/50 hover:bg-slate-100/70 active:bg-slate-200/50 transition-colors duration-150 cursor-pointer"
-        >
-          <div className="w-10 h-10 rounded-xl bg-slate-200 flex items-center justify-center relative text-slate-500 shadow-inner transition-transform duration-150 active:scale-95">
-            <User className="w-5 h-5" />
-            <span className="absolute bottom-[-1.5px] right-[-1.5px] block h-3 w-3 rounded-full ring-[2px] ring-white bg-slate-400" />
+        {/* Profile Details with Hover Logout trigger */}
+        <div className="relative group/profile border-t border-slate-200">
+          {/* Logout button popover on hover */}
+          <div className="absolute bottom-full left-0 right-0 bg-white border-t border-slate-200/80 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] scale-y-0 group-hover/profile:scale-y-100 origin-bottom transition-all duration-200 z-30">
+            <button
+              type="button"
+              onClick={onLogout}
+              className="flex items-center gap-3.5 px-6 py-4 w-full text-left text-[14px] font-semibold text-red-500 hover:bg-red-50 transition-colors duration-200 cursor-pointer focus:outline-none"
+            >
+              <LogOut className="w-5 h-5 text-red-500" />
+              <span>Đăng xuất</span>
+            </button>
           </div>
-          <div className="flex flex-col items-start leading-tight">
-            <span className="text-[14.5px] font-bold text-slate-800">
-              Phùng Văn Duy
-            </span>
-            <span className="text-[10px] font-bold text-slate-400 tracking-wider mt-0.5 uppercase">
-              Ngoại tuyến
-            </span>
+
+          <div 
+            onClick={onProfileClick}
+            className="p-5 flex items-center gap-3 bg-slate-50/50 hover:bg-slate-100/70 active:bg-slate-200/50 transition-colors duration-150 cursor-pointer"
+          >
+            <div className="w-10 h-10 rounded-xl bg-slate-200 flex items-center justify-center relative text-slate-500 shadow-inner transition-transform duration-150 active:scale-95">
+              <User className="w-5 h-5" />
+              <span className="absolute bottom-[-1.5px] right-[-1.5px] block h-3 w-3 rounded-full ring-[2px] ring-white bg-green-500" />
+            </div>
+            <div className="flex flex-col items-start leading-tight">
+              <span className="text-[14.5px] font-bold text-slate-800">
+                Phùng Văn Duy
+              </span>
+              <span className="text-[10px] font-bold text-green-500 tracking-wider mt-0.5 uppercase">
+                Đang hoạt động
+              </span>
+            </div>
           </div>
         </div>
       </div>

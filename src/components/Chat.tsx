@@ -803,14 +803,14 @@ export const Chat: React.FC = () => {
             </form>
           </>
         ) : (
-          /* ================= WELCOME CAROUSEL (MOCKUP ZALO PC) ================= */
-          <div className="flex-1 flex flex-col h-full bg-[#1b222d] text-white relative items-center justify-center overflow-hidden p-12">
+          /* ================= WELCOME CAROUSEL (LIGHT & COHESIVE THEME) ================= */
+          <div className="flex-1 flex flex-col h-full bg-gradient-to-br from-white to-slate-50/80 text-slate-800 relative items-center justify-center overflow-hidden p-12">
             
             {/* Left slide arrow */}
             <button
               type="button"
               onClick={handlePrevWelcomeSlide}
-              className="absolute left-10 top-1/2 transform -translate-y-1/2 w-11 h-11 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white cursor-pointer transition-all z-20 border border-white/5 active:scale-90"
+              className="absolute left-10 top-1/2 transform -translate-y-1/2 w-11 h-11 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 cursor-pointer transition-all z-20 border border-slate-200/50 active:scale-90 shadow-sm"
               title="Slide trước"
             >
               <svg className="w-6 h-6 stroke-current fill-none stroke-[2.5]" viewBox="0 0 24 24">
@@ -822,7 +822,7 @@ export const Chat: React.FC = () => {
             <button
               type="button"
               onClick={handleNextWelcomeSlide}
-              className="absolute right-10 top-1/2 transform -translate-y-1/2 w-11 h-11 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white cursor-pointer transition-all z-20 border border-white/5 active:scale-90"
+              className="absolute right-10 top-1/2 transform -translate-y-1/2 w-11 h-11 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 cursor-pointer transition-all z-20 border border-slate-200/50 active:scale-90 shadow-sm"
               title="Slide sau"
             >
               <svg className="w-6 h-6 stroke-current fill-none stroke-[2.5]" viewBox="0 0 24 24">
@@ -832,26 +832,26 @@ export const Chat: React.FC = () => {
 
             {/* Active Slide content wrapper */}
             <div className="max-w-md w-full flex flex-col items-center text-center px-4 transition-all duration-300">
-              <h2 className="text-[21px] font-bold text-white/95 tracking-tight mb-2.5">
+              <h2 className="text-[21px] font-bold text-slate-800 tracking-tight mb-2.5">
                 {welcomeSlides[currentWelcomeSlide].title}
               </h2>
               
-              <p className="text-[12.5px] text-white/55 leading-relaxed max-w-sm mb-9">
+              <p className="text-[12.8px] text-slate-500 leading-relaxed max-w-sm mb-9">
                 {welcomeSlides[currentWelcomeSlide].description}
               </p>
 
               {/* Slider Image Illustration box */}
-              <div className="relative w-80 h-48 rounded-xl overflow-hidden shadow-2xl border border-white/10 mb-8 bg-[#0b0f19] flex items-center justify-center select-none group">
+              <div className="relative w-80 h-48 rounded-xl overflow-hidden shadow-md border border-slate-200 mb-8 bg-slate-100 flex items-center justify-center select-none group">
                 <img 
                   src={welcomeSlides[currentWelcomeSlide].image} 
                   alt="Slide illustration" 
-                  className="w-full h-full object-cover opacity-75 group-hover:scale-105 transition-transform duration-700"
+                  className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700"
                 />
                 
                 {/* Visual accent for dark mode slide */}
                 {currentWelcomeSlide === 1 && (
-                  <div className="absolute inset-0 bg-slate-950/30 flex items-center justify-center">
-                    <span className="w-14 h-14 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-yellow-400 border border-white/10 text-2xl shadow-inner animate-pulse">
+                  <div className="absolute inset-0 bg-slate-950/20 flex items-center justify-center">
+                    <span className="w-14 h-14 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-yellow-500 border border-slate-250 text-2xl shadow-md animate-pulse">
                       🌙
                     </span>
                   </div>
@@ -859,12 +859,12 @@ export const Chat: React.FC = () => {
               </div>
 
               {/* Tag / Badge */}
-              <span className="text-[13px] font-bold text-blue-400 tracking-wide block mb-1.5">
+              <span className="text-[13px] font-bold text-[#0056C6] tracking-wide block mb-1.5">
                 {welcomeSlides[currentWelcomeSlide].badge}
               </span>
 
               {/* Detail sub-bullet */}
-              <p className="text-[11.8px] text-white/45 leading-relaxed mb-8 max-w-[280px]">
+              <p className="text-[11.8px] text-slate-450 leading-relaxed mb-8 max-w-[280px]">
                 {welcomeSlides[currentWelcomeSlide].detail}
               </p>
 
@@ -873,7 +873,7 @@ export const Chat: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => alert('Đã áp dụng cài đặt giao diện tối!')}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6 py-2.5 rounded-lg transition-colors cursor-pointer shadow-md shadow-blue-900/40 active:scale-95 focus:outline-none"
+                  className="bg-[#0056C6] hover:bg-[#0047A5] text-white font-bold text-xs px-6 py-2.5 rounded-lg transition-colors cursor-pointer shadow-sm active:scale-95 focus:outline-none"
                 >
                   {welcomeSlides[currentWelcomeSlide].actionText}
                 </button>
@@ -889,8 +889,8 @@ export const Chat: React.FC = () => {
                   onClick={() => setCurrentWelcomeSlide(idx)}
                   className={`h-1.5 rounded-full transition-all duration-300 ${
                     idx === currentWelcomeSlide 
-                      ? 'bg-blue-500 w-5' 
-                      : 'bg-white/20 hover:bg-white/40 w-1.5'
+                      ? 'bg-[#0056C6] w-5' 
+                      : 'bg-slate-200 hover:bg-slate-350 w-1.5'
                   }`}
                   title={`Tới slide ${idx + 1}`}
                 />
