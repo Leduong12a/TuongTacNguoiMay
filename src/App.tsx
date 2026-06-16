@@ -32,7 +32,7 @@ function AppContent() {
     navigate('/')
   }
 
-  const isDashboard = location.pathname === '/dashboard'
+  const isDashboard = location.pathname === '/dashboard' || location.pathname === '/profile'
 
   return (
     <div className={isDashboard ? "w-full h-screen bg-white" : "flex-1 flex flex-col justify-center items-center px-4 py-12 sm:px-6 lg:px-8 bg-[#F7F9FC]"}>
@@ -97,6 +97,16 @@ function AppContent() {
           path="/dashboard"
           element={
             <Dashboard
+              initialTab="messages"
+              onLogout={() => navigate('/')}
+            />
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <Dashboard
+              initialTab="profile"
               onLogout={() => navigate('/')}
             />
           }

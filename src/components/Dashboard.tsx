@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Sidebar } from './Sidebar'
 import { Menu, X, User, Camera, Edit3 } from 'lucide-react'
 import { CreateStory } from './story/CreateStory'
@@ -7,17 +7,24 @@ import { SearchFriend } from './SearchFriend'
 import { Contacts } from './Contacts'
 import { Chat } from './Chat'
 import { Calls } from './Calls'
+import { Search } from './search/Search'
+import { Profile } from './profile/Profile'
 
 interface DashboardProps {
   onLogout: () => void
+  initialTab?: string
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
-  const [activeTab, setActiveTab] = useState<string>('profile')
+export const Dashboard: React.FC<DashboardProps> = ({ onLogout, initialTab = 'messages' }) => {
+  const [activeTab, setActiveTab] = useState<string>(initialTab)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false)
   const [isCreateStoryOpen, setIsCreateStoryOpen] = useState<boolean>(false)
   const [isCreatePostOpen, setIsCreatePostOpen] = useState<boolean>(false)
+
+  useEffect(() => {
+    setActiveTab(initialTab)
+  }, [initialTab])
 
 
   return (
@@ -104,10 +111,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           <Calls />
         ) : activeTab === 'search' ? (
           <SearchFriend />
+        ) : activeTab === 'profile' ? (
+          <Profile />
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-slate-400 font-semibold text-sm">
-            <span className="text-[16px] text-slate-400 font-bold uppercase tracking-wider mb-2">
-              Tab {activeTab === 'profile' ? 'Hồ sơ' : 'Cài đặt'}
+            <span className="text-[16px] text-slate-405 font-bold uppercase tracking-wider mb-2">
+              Tab Cài đặt
             </span>
             <span className="text-[13px] text-slate-400 font-medium">
               Nội dung của tab đang được phát triển...
