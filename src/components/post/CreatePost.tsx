@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { X, Image as ImageIcon, UserPlus, MapPin, Smile, User, Check } from 'lucide-react'
+import { X, Image as ImageIcon, UserPlus, MapPin, Smile, User } from 'lucide-react'
 import { PostPrivacySelector } from './PostPrivacySelector'
 import { MediaUpload } from './MediaUpload'
 import { PostMusicPlayer } from './PostMusicPlayer'
