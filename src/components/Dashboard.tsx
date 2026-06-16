@@ -5,6 +5,7 @@ import { CreateStory } from './story/CreateStory'
 import { CreatePost } from './post/CreatePost'
 import { Search } from './search/Search'
 import { Profile } from './profile/Profile'
+import { Settings } from './settings/Settings'
 
 interface DashboardProps {
   onLogout: () => void
@@ -101,7 +102,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, initialTab = 'me
       <main className="flex-1 flex flex-col min-w-0 pt-14 md:pt-0 bg-[#F7F9FC] relative">
         {activeTab === 'search' && <Search onClose={() => setActiveTab('messages')} />}
         {activeTab === 'profile' && <Profile />}
-        {activeTab === 'messages' || (activeTab !== 'search' && activeTab !== 'profile') && (
+        {activeTab === 'settings' && <Settings />}
+        {activeTab !== 'search' && activeTab !== 'profile' && activeTab !== 'settings' && (
           <div className="flex-1 flex items-center justify-center text-slate-400 font-semibold text-sm">
             {/* Messages/Chat content area - placeholder */}
           </div>
