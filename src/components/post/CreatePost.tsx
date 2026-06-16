@@ -6,6 +6,8 @@ import { PostMusicPlayer } from './PostMusicPlayer'
 import { ImageSelectorModal } from './ImageSelectorModal'
 import { TagFriendsModal } from './TagFriendsModal'
 import { LocationSelectorModal } from './LocationSelectorModal'
+import { FeelingSelectorModal } from './FeelingSelectorModal'
+import type { FeelingItem } from './FeelingSelectorModal'
 
 interface CreatePostProps {
   onClose: () => void
@@ -31,6 +33,9 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onClose, onPublish }) =>
   const [isImageSelectorOpen, setIsImageSelectorOpen] = useState<boolean>(false)
   const [isTagFriendsOpen, setIsTagFriendsOpen] = useState<boolean>(false)
   const [isLocationSelectorOpen, setIsLocationSelectorOpen] = useState<boolean>(false)
+  const [isFeelingSelectorOpen, setIsFeelingSelectorOpen] = useState<boolean>(false)
+  
+  const [feeling, setFeeling] = useState<FeelingItem | null>(null)
   const [music, setMusic] = useState<{ title: string; artist: string } | null>({
     title: 'Lofi Chill Beats',
     artist: 'Various Artists'
@@ -87,12 +92,8 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onClose, onPublish }) =>
     setIsTagFriendsOpen(true)
   }
 
-  const handleAddEmoji = () => {
-    if (text === 'Bạn đang nghĩ gì?') {
-      setText('😊')
-    } else {
-      setText(prev => prev + ' 😊')
-    }
+  const handleToggleFeeling = () => {
+    setIsFeelingSelectorOpen(true)
   }
 
   return (
@@ -129,6 +130,11 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onClose, onPublish }) =>
             <div className="flex flex-col items-start gap-1">
               <div className="flex flex-wrap items-center gap-1 text-[14.5px] font-bold text-slate-800">
                 <span>Lê Minh</span>
+                {feeling && (
+                  <span className="text-slate-500 font-normal">
+                    đang cảm thấy <span className="font-semibold text-slate-700">{feeling.emoji} {feeling.label}</span>
+                  </span>
+                )}
                 {renderTaggedFriends()}
                 {location && (
                   <span className="text-slate-550 font-normal">
@@ -220,9 +226,11 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onClose, onPublish }) =>
               {/* Emoji Button */}
               <button
                 type="button"
-                onClick={handleAddEmoji}
-                className="p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-650 rounded-lg cursor-pointer transition-all duration-150 active:scale-90"
-                title="Thêm emoji"
+                onClick={handleToggleFeeling}
+                className={`p-2 rounded-lg cursor-pointer transition-all duration-150 active:scale-90 ${
+                  feeling ? 'bg-blue-50 text-[#1877F2]' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-650'
+                }`}
+                title="Thêm cảm xúc/hoạt động"
               >
                 <Smile className="w-4.5 h-4.5" />
               </button>
@@ -286,6 +294,18 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onClose, onPublish }) =>
           onSelect={(locationName) => {
             setLocation(locationName)
             setIsLocationSelectorOpen(false)
+          }}
+        />
+      )}
+
+      {/* Feeling Selector Modal */}
+      {isFeelingSelectorOpen && (
+        <FeelingSelectorModal
+          currentFeeling={feeling}
+          onClose={() => setIsFeelingSelectorOpen(false)}
+          onSelect={(feelingData) => {
+            setFeeling(feelingData)
+            setIsFeelingSelectorOpen(false)
           }}
         />
       )}
