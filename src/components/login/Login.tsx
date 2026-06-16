@@ -22,7 +22,12 @@ export const Login: React.FC<LoginProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    onLoginSuccess(emailOrPhone)
+    
+    if (emailOrPhone.trim() === 'admin@gmail.com' && password === 'admin123') {
+      onLoginSuccess(emailOrPhone)
+    } else {
+      setError('Tài khoản hoặc mật khẩu không chính xác!')
+    }
   }
 
   const handleEmailOrPhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,14 +140,23 @@ export const Login: React.FC<LoginProps> = ({
       </form>
 
       {/* Footer Register Link */}
-      <div className="mt-8 text-[14px] text-[#4A4A4A] text-center font-medium">
+      <div className="mt-6 text-[14px] text-[#4A4A4A] text-center font-medium">
         Chưa có tài khoản?{' '}
         <button
+          type="button"
           onClick={onNavigateToRegister}
           className="font-bold text-[#0056C6] hover:underline cursor-pointer ml-1 text-inherit"
         >
           Đăng ký ngay
         </button>
+      </div>
+
+      {/* Demo Credentials Tip */}
+      <div className="mt-5 w-full bg-slate-50 border border-slate-100 p-3 rounded-xl flex flex-col items-center gap-1">
+        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tài khoản demo</span>
+        <span className="text-[13px] font-bold text-slate-700">
+          admin@gmail.com <span className="font-normal text-slate-400">/</span> admin123
+        </span>
       </div>
 
     </div>
