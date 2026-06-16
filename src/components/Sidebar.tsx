@@ -4,14 +4,12 @@ import { useNavigate } from 'react-router-dom'
 
 interface SidebarProps {
   activeTab: string
-  onTabChange: (tab: string) => void
   onLogout: () => void
   onProfileClick?: () => void
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
-  onTabChange,
   onLogout,
   onProfileClick,
 }) => {
@@ -27,13 +25,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ]
 
   const handleMenuClick = (id: string) => {
-    if (id === 'profile') {
-      navigate('/profile')
-    } else if (id === 'chat') {
-      navigate('/dashboard')
-    } else {
-      onTabChange(id)
-    }
+    navigate(`/${id}`)
   }
 
   const getActiveTab = () => {

@@ -9,7 +9,8 @@ import {
   Paperclip, 
   Image as ImageIcon,
   Plus,
-  CheckCheck
+  CheckCheck,
+  MessageSquare
 } from 'lucide-react'
 
 interface Message {

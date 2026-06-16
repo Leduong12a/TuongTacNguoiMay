@@ -65,8 +65,8 @@ export const Calls: React.FC = () => {
 
   // Handle Call Timer
   useEffect(() => {
-    let statusTimer: NodeJS.Timeout
-    let secondsTimer: NodeJS.Timeout
+    let statusTimer: any
+    let secondsTimer: any
 
     if (activeCallUser && callStatus !== 'ended') {
       if (callStatus === 'connecting') {

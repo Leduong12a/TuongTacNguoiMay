@@ -7,15 +7,15 @@ import { SearchFriend } from './SearchFriend'
 import { Contacts } from './Contacts'
 import { Chat } from './Chat'
 import { Calls } from './Calls'
-import { Search } from './search/Search'
 import { Profile } from './profile/Profile'
+import { Settings } from './settings/Settings'
 
 interface DashboardProps {
   onLogout: () => void
   initialTab?: string
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ onLogout, initialTab = 'messages' }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ onLogout, initialTab = 'chat' }) => {
   const [activeTab, setActiveTab] = useState<string>(initialTab)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false)
@@ -25,6 +25,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, initialTab = 'me
   useEffect(() => {
     setActiveTab(initialTab)
   }, [initialTab])
+
+  useEffect(() => {
+    setIsMobileSidebarOpen(false)
+  }, [activeTab])
 
 
   return (
@@ -59,7 +63,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, initialTab = 'me
       <div className="hidden md:flex shrink-0">
         <Sidebar 
           activeTab={activeTab} 
-          onTabChange={setActiveTab} 
           onLogout={onLogout} 
           onProfileClick={() => setIsCreateModalOpen(true)}
         />
@@ -91,17 +94,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, initialTab = 'me
 
           <Sidebar 
             activeTab={activeTab} 
-            onTabChange={(tab) => {
-              setActiveTab(tab)
-              setIsMobileSidebarOpen(false)
-            }} 
             onLogout={onLogout} 
             onProfileClick={() => setIsCreateModalOpen(true)}
           />
         </div>
       </div>
 
-      {/* Main content display section */}
       <main className="flex-1 flex flex-col min-w-0 pt-14 md:pt-0 bg-[#F7F9FC] relative overflow-hidden">
         {activeTab === 'chat' ? (
           <Chat />
@@ -113,14 +111,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, initialTab = 'me
           <SearchFriend />
         ) : activeTab === 'profile' ? (
           <Profile />
+        ) : activeTab === 'settings' ? (
+          <Settings />
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center text-slate-400 font-semibold text-sm">
-            <span className="text-[16px] text-slate-405 font-bold uppercase tracking-wider mb-2">
-              Tab Cài đặt
-            </span>
-            <span className="text-[13px] text-slate-400 font-medium">
-              Nội dung của tab đang được phát triển...
-            </span>
+          <div className="flex-1 flex items-center justify-center text-slate-400 font-semibold text-sm">
+            {/* Messages/Chat content area - placeholder */}
           </div>
         )}
       </main>

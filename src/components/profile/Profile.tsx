@@ -1,358 +1,263 @@
-import React, { useState } from 'react'
-import { Camera, Mail, MapPin, Phone, Edit3, Eye, EyeOff } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { Pencil, ChevronDown, HelpCircle, Check, X } from 'lucide-react'
 
 interface ProfileData {
   name: string
-  position: string
   email: string
   phone: string
-  address: string
-  bio: string
+  status: string
+  note: string
 }
 
 export const Profile: React.FC = () => {
   const [profileData, setProfileData] = useState<ProfileData>({
     name: 'Nguyễn Văn A',
-    position: 'Nhân viên',
-    email: 'example@gmail.com',
+    email: 'nguyenvana@example.com',
     phone: '+84 123 456 789',
-    address: 'Hà Nội, Việt Nam',
-    bio: 'Đây là tiểu sử của tôi'
+    status: 'Trực tuyến',
+    note: 'Đang làm việc'
   })
 
-  const [editData, setEditData] = useState<ProfileData>(profileData)
-  const [isEditing, setIsEditing] = useState(false)
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [showNewPassword, setShowNewPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  // Track current form inputs
+  const [formData, setFormData] = useState<ProfileData>(profileData)
+  
+  // Dialog visibility states
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [showSuccessToast, setShowSuccessToast] = useState(false)
+
+  // Auto-hide success toast after 3 seconds
+  useEffect(() => {
+    if (showSuccessToast) {
+      const timer = setTimeout(() => {
+        setShowSuccessToast(false)
+      }, 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [showSuccessToast])
 
   const handleInputChange = (field: keyof ProfileData, value: string) => {
-    setEditData(prev => ({
+    setFormData(prev => ({
       ...prev,
       [field]: value
     }))
   }
 
-  const handleSaveChanges = () => {
-    setProfileData(editData)
-    setIsEditing(false)
-    alert('Thay đổi hồ sơ đã được lưu thành công!')
+  const handleSaveClick = () => {
+    setShowConfirmModal(true)
+  }
+
+  const handleConfirmSave = () => {
+    setProfileData(formData)
+    setShowConfirmModal(false)
+    setShowSuccessToast(true)
+  }
+
+  const handleCancelSave = () => {
+    setShowConfirmModal(false)
+  }
+
+  const handleToastClose = () => {
+    setShowSuccessToast(false)
   }
 
   const handleChangeAvatar = () => {
-    setShowConfirmDialog(true)
-  }
-
-  const confirmChangeAvatar = () => {
-    setShowConfirmDialog(false)
-    alert('Ảnh đại diện đã được cập nhật!')
-  }
-
-  const handleChangePassword = () => {
-    if (newPassword !== confirmPassword) {
-      alert('Mật khẩu không khớp!')
-      return
-    }
-    if (newPassword.length < 6) {
-      alert('Mật khẩu phải có ít nhất 6 ký tự!')
-      return
-    }
-    alert('Mật khẩu đã được thay đổi thành công!')
-    setNewPassword('')
-    setConfirmPassword('')
+    alert('Chức năng tải lên hình ảnh mới')
   }
 
   return (
-    <div className="flex-1 overflow-auto bg-[#F7F9FC] p-4 md:p-8">
-      <div className="max-w-5xl mx-auto">
+    <div className="flex-1 overflow-auto bg-[#f5f7fb] relative font-sans p-8">
+      
+      {/* Success Toast Notification */}
+      {showSuccessToast && (
+        <div className="fixed top-6 right-6 z-55 flex items-center gap-2 px-4 py-2 bg-white border border-[#2E7D32]/25 rounded shadow-lg animate-slideIn">
+          <div className="w-5 h-5 rounded-full bg-[#EAF7EE] border border-[#A2E0B8] flex items-center justify-center text-[#2E7D32] shrink-0">
+            <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+          </div>
+          <span className="text-xs font-bold text-slate-800">Cập nhật thành công</span>
+          <button 
+            onClick={handleToastClose}
+            className="p-0.5 hover:bg-slate-100 rounded text-slate-400 hover:text-slate-600 transition-colors ml-2"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
+      <div className="max-w-4xl mx-auto">
         
-        {/* Page Header */}
+        {/* Header Section */}
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">Hồ sơ cá nhân</h1>
-          <p className="text-slate-600">Quản lý thông tin cá nhân và cài đặt liên hệ của bạn</p>
+          <h1 className="text-2xl font-bold text-[#0f2942] mb-1">Hồ sơ cá nhân</h1>
+          <p className="text-slate-500 text-xs font-medium">Quản lý thông tin cá nhân và cài đặt bảo mật của bạn.</p>
         </div>
 
-        {/* Main Profile Card */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-6">
+        {/* Main Columns Container */}
+        <div className="flex flex-col md:flex-row gap-8 items-start mb-8">
           
-          {/* Profile Header - Avatar + Basic Info */}
-          <div className="p-6 md:p-8">
-            <div className="flex flex-col md:flex-row gap-8">
-              {/* Left: Avatar */}
-              <div className="flex flex-col items-center md:items-start">
-                <div className="relative mb-6">
-                  <div className="w-28 h-28 rounded-full bg-gradient-to-br from-slate-300 to-slate-400 flex items-center justify-center shadow-md overflow-hidden">
-                    <svg
-                      className="w-14 h-14 text-slate-500"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                    </svg>
-                  </div>
-                  <button
-                    onClick={handleChangeAvatar}
-                    className="absolute bottom-0 right-0 bg-[#0056C6] text-white p-2.5 rounded-full shadow-lg hover:bg-blue-700 transition-colors cursor-pointer hover:scale-110"
-                  >
-                    <Camera className="w-4 h-4" />
-                  </button>
-                </div>
-                <button
-                  onClick={() => setIsEditing(!isEditing)}
-                  className="px-6 py-2.5 bg-[#0056C6] text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer text-sm font-semibold flex items-center gap-2"
-                >
-                  <Edit3 className="w-4 h-4" />
-                  {isEditing ? 'Hủy' : 'Thay đổi ảnh'}
-                </button>
-              </div>
-
-              {/* Right: Basic Info Grid */}
-              <div className="flex-1">
-                <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-slate-900">{profileData.name}</h2>
-                  <p className="text-slate-600 text-sm">{profileData.position}</p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Email */}
-                  <div>
-                    <label className="text-xs font-semibold text-slate-500 uppercase block mb-1">Email</label>
-                    <p className="text-slate-800 text-sm flex items-center gap-2 font-medium">
-                      <Mail className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                      {profileData.email}
-                    </p>
-                  </div>
-
-                  {/* Phone */}
-                  <div>
-                    <label className="text-xs font-semibold text-slate-500 uppercase block mb-1">Số điện thoại</label>
-                    <p className="text-slate-800 text-sm flex items-center gap-2 font-medium">
-                      <Phone className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                      {profileData.phone}
-                    </p>
-                  </div>
-
-                  {/* Address - span 2 columns */}
-                  <div className="md:col-span-2">
-                    <label className="text-xs font-semibold text-slate-500 uppercase block mb-1">Địa chỉ</label>
-                    <p className="text-slate-800 text-sm flex items-center gap-2 font-medium">
-                      <MapPin className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                      {profileData.address}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div className="border-t border-slate-200"></div>
-
-          {/* Basic Info Section */}
-          <div className="p-6 md:p-8">
-            <h3 className="text-lg font-bold text-slate-900 mb-6">Thông tin cơ bản</h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              {/* Name */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Tên đầy đủ
-                </label>
-                <input
-                  type="text"
-                  value={isEditing ? editData.name : profileData.name}
-                  onChange={(e) => isEditing && handleInputChange('name', e.target.value)}
-                  disabled={!isEditing}
-                  className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg bg-white text-slate-800 disabled:bg-slate-50 disabled:text-slate-600 text-sm focus:outline-none focus:border-[#0056C6] focus:ring-1 focus:ring-[#0056C6] transition-colors"
-                />
-              </div>
-
-              {/* Position */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Chức vụ
-                </label>
-                <input
-                  type="text"
-                  value={isEditing ? editData.position : profileData.position}
-                  onChange={(e) => isEditing && handleInputChange('position', e.target.value)}
-                  disabled={!isEditing}
-                  className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg bg-white text-slate-800 disabled:bg-slate-50 disabled:text-slate-600 text-sm focus:outline-none focus:border-[#0056C6] focus:ring-1 focus:ring-[#0056C6] transition-colors"
-                />
-              </div>
-
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={isEditing ? editData.email : profileData.email}
-                  onChange={(e) => isEditing && handleInputChange('email', e.target.value)}
-                  disabled={!isEditing}
-                  className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg bg-white text-slate-800 disabled:bg-slate-50 disabled:text-slate-600 text-sm focus:outline-none focus:border-[#0056C6] focus:ring-1 focus:ring-[#0056C6] transition-colors"
-                />
-              </div>
-
-              {/* Phone */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Số điện thoại
-                </label>
-                <input
-                  type="tel"
-                  value={isEditing ? editData.phone : profileData.phone}
-                  onChange={(e) => isEditing && handleInputChange('phone', e.target.value)}
-                  disabled={!isEditing}
-                  className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg bg-white text-slate-800 disabled:bg-slate-50 disabled:text-slate-600 text-sm focus:outline-none focus:border-[#0056C6] focus:ring-1 focus:ring-[#0056C6] transition-colors"
-                />
-              </div>
-
-              {/* Address - span 2 columns */}
-              <div className="md:col-span-2">
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Địa chỉ
-                </label>
-                <input
-                  type="text"
-                  value={isEditing ? editData.address : profileData.address}
-                  onChange={(e) => isEditing && handleInputChange('address', e.target.value)}
-                  disabled={!isEditing}
-                  className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg bg-white text-slate-800 disabled:bg-slate-50 disabled:text-slate-600 text-sm focus:outline-none focus:border-[#0056C6] focus:ring-1 focus:ring-[#0056C6] transition-colors"
-                />
-              </div>
-
-              {/* Bio - span 2 columns */}
-              <div className="md:col-span-2">
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Tiểu sử
-                </label>
-                <textarea
-                  value={isEditing ? editData.bio : profileData.bio}
-                  onChange={(e) => isEditing && handleInputChange('bio', e.target.value)}
-                  disabled={!isEditing}
-                  className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg bg-white text-slate-800 disabled:bg-slate-50 disabled:text-slate-600 text-sm focus:outline-none focus:border-[#0056C6] focus:ring-1 focus:ring-[#0056C6] transition-colors resize-none h-20"
-                />
-              </div>
-            </div>
-
-            {isEditing && (
-              <button
-                onClick={handleSaveChanges}
-                className="w-full px-4 py-3 bg-[#0056C6] text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer font-semibold"
-              >
-                Lưu thay đổi
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Security Card */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="p-6 md:p-8">
-            <h3 className="text-lg font-bold text-slate-900 mb-6">Bảo mật</h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* New Password */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Mật khẩu mới
-                </label>
-                <div className="relative">
-                  <input
-                    type={showNewPassword ? 'text' : 'password'}
-                    placeholder="Nhập mật khẩu mới"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg bg-white text-slate-800 placeholder-slate-400 text-sm focus:outline-none focus:border-[#0056C6] focus:ring-1 focus:ring-[#0056C6] transition-colors pr-10"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-                  >
-                    {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Confirm Password */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Xác nhận mật khẩu
-                </label>
-                <div className="relative">
-                  <input
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    placeholder="Xác nhận mật khẩu mới"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg bg-white text-slate-800 placeholder-slate-400 text-sm focus:outline-none focus:border-[#0056C6] focus:ring-1 focus:ring-[#0056C6] transition-colors pr-10"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-                  >
-                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {(newPassword || confirmPassword) && (
-              <button
-                onClick={handleChangePassword}
-                className="w-full px-4 py-3 bg-[#0056C6] text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer font-semibold mt-6"
-              >
-                Đổi mật khẩu
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Confirmation Dialog */}
-      {showConfirmDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
-            onClick={() => setShowConfirmDialog(false)}
-          />
-
-          {/* Dialog */}
-          <div className="relative bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl border border-slate-200 z-50">
-            <div className="text-center">
-              <div className="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
+          {/* Left Column: Avatar */}
+          <div className="flex flex-col items-center shrink-0 w-full md:w-44">
+            <div className="relative">
+              {/* Square avatar placeholder matching image 2 */}
+              <div className="w-40 h-40 bg-[#d4d8e0] rounded-xl flex items-center justify-center overflow-hidden shadow-sm border border-slate-200">
                 <svg
-                  className="w-7 h-7 text-[#0056C6]"
+                  className="w-28 h-28 text-slate-500 mt-6"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-13c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5z" />
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold text-slate-800 mb-2">
-                Bạn có chắc chắn thay đổi ảnh đại diện?
+              {/* Blue edit pencil button in bottom-right */}
+              <button
+                onClick={handleChangeAvatar}
+                className="absolute bottom-1 right-1 bg-[#0056C6] hover:bg-blue-700 text-white p-1.5 rounded-full shadow border-2 border-white flex items-center justify-center cursor-pointer transition-all active:scale-90"
+                title="Thay đổi ảnh"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            {/* Clickable text link */}
+            <button
+              onClick={handleChangeAvatar}
+              className="mt-3 text-xs font-bold text-blue-600 hover:text-blue-700 hover:underline transition-colors"
+            >
+              Thay đổi ảnh
+            </button>
+          </div>
+
+          {/* Right Column: Forms */}
+          <div className="flex-1 flex flex-col gap-5 w-full">
+            
+            {/* Card: Thông tin cơ bản */}
+            <div className="bg-white border border-slate-200 rounded-lg p-5 shadow-sm">
+              <h3 className="text-sm font-bold text-slate-800 mb-5 pb-2 border-b border-slate-100">Thông tin cơ bản</h3>
+              
+              <div className="space-y-4">
+                {/* Họ và tên */}
+                <div>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Họ và tên</label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    className="w-full px-3 py-1.5 border border-slate-300 rounded text-slate-700 text-xs focus:outline-none focus:border-blue-500 transition-all"
+                  />
+                </div>
+
+                {/* Địa chỉ email */}
+                <div>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Địa chỉ email</label>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    className="w-full px-3 py-1.5 border border-slate-300 rounded text-slate-700 text-xs focus:outline-none focus:border-blue-500 transition-all"
+                  />
+                </div>
+
+                {/* Số điện thoại */}
+                <div>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Số điện thoại</label>
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => handleInputChange('phone', e.target.value)}
+                    className="w-full px-3 py-1.5 border border-slate-300 rounded text-slate-700 text-xs focus:outline-none focus:border-blue-500 transition-all"
+                  />
+                </div>
+
+                {/* Row: Trạng thái & Ghi chú */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Trạng thái */}
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Trạng thái</label>
+                    <div className="relative">
+                      <select
+                        value={formData.status}
+                        onChange={(e) => handleInputChange('status', e.target.value)}
+                        className="w-full px-3 py-1.5 border border-slate-300 rounded bg-white text-slate-700 text-xs focus:outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer pr-8"
+                      >
+                        <option value="Trực tuyến">Trực tuyến</option>
+                        <option value="Bận">Bận</option>
+                        <option value="Không có mặt">Không có mặt</option>
+                      </select>
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-slate-400">
+                        <ChevronDown className="w-3.5 h-3.5" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Ghi chú */}
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Ghi chú</label>
+                    <input
+                      type="text"
+                      value={formData.note}
+                      onChange={(e) => handleInputChange('note', e.target.value)}
+                      className="w-full px-3 py-1.5 border border-slate-300 rounded text-slate-700 text-xs focus:outline-none focus:border-blue-500 transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Card: Bảo mật */}
+            <div className="bg-white border border-slate-200 rounded-lg p-5 shadow-sm">
+              <h3 className="text-sm font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100">Bảo mật</h3>
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-bold text-slate-800">Mật khẩu</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">Cập nhật lần cuối: 2 tháng trước</p>
+                </div>
+                <button
+                  onClick={() => alert('Chức năng đổi mật khẩu')}
+                  className="px-4 py-1.5 border border-slate-300 hover:border-slate-400 text-slate-700 hover:bg-slate-50 rounded font-bold text-xs transition-all cursor-pointer"
+                >
+                  Đổi mật khẩu
+                </button>
+              </div>
+            </div>
+
+            {/* Save Button Row */}
+            <div className="flex justify-end mt-2">
+              <button
+                onClick={handleSaveClick}
+                className="px-6 py-2 bg-[#0056C6] hover:bg-blue-700 text-white rounded font-bold text-xs transition-all active:scale-97 cursor-pointer shadow-sm"
+              >
+                Lưu thay đổi
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      {/* Confirmation Modal */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-[1px]">
+          <div className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl border border-slate-150 z-50">
+            <div className="text-center">
+              {/* Question Icon Circle */}
+              <div className="w-14 h-14 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center mx-auto mb-4 text-[#0056C6]">
+                <HelpCircle className="w-8 h-8 stroke-[2.5]" />
+              </div>
+              
+              <h3 className="text-xs font-bold text-slate-800 mb-6 px-2 leading-relaxed">
+                Bạn có xác nhận thay đổi hồ sơ không?
               </h3>
-              <p className="text-sm text-slate-500 mb-6">
-                Ảnh đại diện của bạn sẽ được thay đổi ngay lập tức.
-              </p>
 
               <div className="flex gap-3">
                 <button
-                  onClick={() => setShowConfirmDialog(false)}
-                  className="flex-1 px-4 py-2.5 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer font-semibold"
+                  onClick={handleCancelSave}
+                  className="flex-1 px-4 py-2 border border-slate-200 text-slate-600 rounded hover:bg-slate-50 transition-colors cursor-pointer font-bold text-xs"
                 >
-                  Hủy
+                  Không
                 </button>
                 <button
-                  onClick={confirmChangeAvatar}
-                  className="flex-1 px-4 py-2.5 bg-[#0056C6] text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer font-semibold"
+                  onClick={handleConfirmSave}
+                  className="flex-1 px-4 py-2 bg-[#0056C6] hover:bg-blue-700 text-white rounded transition-colors cursor-pointer font-bold text-xs"
                 >
                   Có
                 </button>
@@ -361,6 +266,7 @@ export const Profile: React.FC = () => {
           </div>
         </div>
       )}
+
     </div>
   )
 }
