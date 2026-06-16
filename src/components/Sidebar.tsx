@@ -42,7 +42,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </svg>
           </div>
           <span className="text-[20px] font-bold text-[#0056C6] tracking-tight">
-            ChatApp
+            Messenger
           </span>
         </div>
 
