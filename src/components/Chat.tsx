@@ -17,42 +17,12 @@ import {
   FileText,
   Download,
   ArrowLeft,
-  Mic,
-  MicOff,
-  Volume2,
-  VolumeX,
-  VideoOff,
-  BellOff,
-  Timer,
-  Palette,
 } from "lucide-react";
-
-interface Message {
-  id: string;
-  senderId: "me" | "other";
-  senderName: string;
-  text: string;
-  time: string;
-  status?: "sent" | "delivered" | "read";
-  attachment?: {
-    name: string;
-    size: string;
-    type: string;
-  };
-}
-
-interface ChatThread {
-  id: string;
-  name: string;
-  avatar: string;
-  avatarBg: string;
-  isGroup: boolean;
-  lastMessage: string;
-  time: string;
-  unreadCount: number;
-  status: "online" | "offline" | string;
-  messages: Message[];
-}
+import { CallModal } from "./chat/CallModal";
+import { CreateGroupModal } from "./chat/CreateGroupModal";
+import { ChatOptionsPanel } from "./chat/ChatOptionsPanel";
+import { WelcomeCarousel } from "./chat/WelcomeCarousel";
+import type { Message, ChatThread, Contact } from "./chat/types";
 
 const welcomeSlides = [
   {
@@ -309,14 +279,10 @@ export const Chat: React.FC = () => {
     null,
   );
   const [muteForever, setMuteForever] = useState(false);
-
-  // Create group modal state
+  // Create group modal
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
-  const [newGroupName, setNewGroupName] = useState("");
-  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
-  const [memberSearch, setMemberSearch] = useState("");
 
-  const mockContacts = [
+  const mockContacts: Contact[] = [
     { id: "c1", name: "Lê Quý Dương", avatar: "QD", avatarBg: "bg-green-600", status: "Vừa mới truy cập", statusColor: "text-slate-400" },
     { id: "c2", name: "Lại Anh Đào", avatar: "AD", avatarBg: "bg-pink-500", status: "Đang hoạt động", statusColor: "text-green-500" },
     { id: "c3", name: "Vũ Quốc Trung", avatar: "VT", avatarBg: "bg-indigo-600", status: "2 giờ trước", statusColor: "text-slate-400" },
@@ -325,37 +291,11 @@ export const Chat: React.FC = () => {
     { id: "c6", name: "Đỗ Đình An", avatar: "DA", avatarBg: "bg-indigo-500", status: "Đang hoạt động", statusColor: "text-green-500" },
   ];
 
-  const filteredContacts = mockContacts.filter(c =>
-    c.name.toLowerCase().includes(memberSearch.toLowerCase())
-  );
-
-  const handleToggleMember = (id: string) => {
-    setSelectedMembers(prev =>
-      prev.includes(id) ? prev.filter(m => m !== id) : [...prev, id]
-    );
-  };
-
-  const handleCreateGroup = () => {
-    if (!newGroupName.trim() || selectedMembers.length < 2) return;
-    const memberNames = mockContacts.filter(c => selectedMembers.includes(c.id)).map(c => c.name);
-    const newThread: ChatThread = {
-      id: `group_${Date.now()}`,
-      name: newGroupName.trim(),
-      avatar: newGroupName.trim().slice(0, 2).toUpperCase(),
-      avatarBg: "bg-gradient-to-tr from-violet-500 to-blue-600",
-      isGroup: true,
-      lastMessage: "Nhóm được tạo",
-      time: "Vừa xong",
-      unreadCount: 0,
-      status: `${selectedMembers.length + 1} thành viên`,
-      messages: [{ id: `msg_init`, senderId: "me", senderName: "Phùng Văn Duy", text: `Đã tạo nhóm "${newGroupName.trim()}" với ${memberNames.join(", ")}`, time: "Vừa xong" }],
-    };
+  const handleGroupCreated = (threadData: Omit<ChatThread, "id">) => {
+    const newThread: ChatThread = { ...threadData, id: `group_${Date.now()}` };
     setThreads(prev => [newThread, ...prev]);
     setActiveThreadId(newThread.id);
     setShowCreateGroupModal(false);
-    setNewGroupName("");
-    setSelectedMembers([]);
-    setMemberSearch("");
   };
 
   // Timer effect when connected
@@ -1088,527 +1028,59 @@ export const Chat: React.FC = () => {
               </form>
             </div>
 
-            {/* ======================================================== */}
-            {/* RIGHT SIDEBAR: Info / Options Panel */}
-            {/* ======================================================== */}
-            {showOptionsPanel && (
-              <div className="w-[280px] shrink-0 bg-white border-l border-slate-200 flex flex-col h-full overflow-y-auto transition-all duration-300">
-                {/* Avatar & Name */}
-                <div className="flex flex-col items-center py-8 px-4 border-b border-slate-100">
-                  <div
-                    className={`w-20 h-20 rounded-full ${activeThread.avatarBg} text-white font-bold text-[26px] flex items-center justify-center shadow-md mb-3`}
-                  >
-                    {activeThread.avatar}
-                  </div>
-                  <span className="text-[15px] font-bold text-slate-800">
-                    {activeThread.name}
-                  </span>
-                  <span className="text-[11.5px] text-slate-400 font-medium mt-1">
-                    {activeThread.isGroup
-                      ? activeThread.status
-                      : activeThread.status === "online"
-                        ? "Đang hoạt động"
-                        : "Ngoại tuyến"}
-                  </span>
-                </div>
-
-                {/* Menu Items */}
-                <div className="p-3 flex flex-col gap-1.5">
-                  {/* Đổi hình nền chat */}
-                  <div className="rounded-xl border border-slate-100 overflow-hidden">
-                    <button
-                      type="button"
-                      onClick={() => setExpandBg((prev) => !prev)}
-                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors"
-                    >
-                      <div className="flex items-center gap-3 text-slate-700">
-                        <Palette className="w-4 h-4 text-slate-500" />
-                        <span className="text-[13px] font-semibold">
-                          Đổi hình nền chat
-                        </span>
-                      </div>
-                      <ChevronDown
-                        className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${expandBg ? "rotate-180" : ""}`}
-                      />
-                    </button>
-                    {expandBg && (
-                      <div className="px-4 pb-3 pt-1 flex flex-col gap-1 border-t border-slate-100">
-                        {[
-                          "Màu xanh dương",
-                          "Màu trắng tinh",
-                          "Gradient tím",
-                          "Gradient xanh lá",
-                        ].map((bg) => (
-                          <button
-                            key={bg}
-                            type="button"
-                            className="text-left text-[12.5px] text-slate-600 hover:text-[#0056C6] py-1.5 px-2 rounded-lg hover:bg-blue-50 transition-colors"
-                          >
-                            {bg}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Tin nhắn tự xóa */}
-                  <div className="rounded-xl border border-slate-100 overflow-hidden">
-                    <button
-                      type="button"
-                      onClick={() => setExpandAutoDelete((prev) => !prev)}
-                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors"
-                    >
-                      <div className="flex items-center gap-3 text-slate-700">
-                        <Timer className="w-4 h-4 text-slate-500" />
-                        <span className="text-[13px] font-semibold">
-                          Tin nhắn tự xóa
-                        </span>
-                      </div>
-                      <ChevronDown
-                        className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${expandAutoDelete ? "rotate-180" : ""}`}
-                      />
-                    </button>
-                    {expandAutoDelete && (
-                      <div className="px-4 pb-3 pt-2 border-t border-slate-100">
-                        <div className="flex gap-2">
-                          {(["off", "24h", "7d"] as const).map((opt) => (
-                            <button
-                              key={opt}
-                              type="button"
-                              onClick={() => setAutoDeleteOption(opt)}
-                              className={`flex-1 py-1.5 rounded-lg text-[12px] font-bold border transition-all ${
-                                autoDeleteOption === opt
-                                  ? "bg-[#E8F1FF] border-[#0056C6] text-[#0056C6]"
-                                  : "border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50"
-                              }`}
-                            >
-                              {opt === "off" ? "Off" : opt}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Tắt thông báo */}
-                  <div className="rounded-xl border border-slate-100 overflow-hidden">
-                    <button
-                      type="button"
-                      onClick={() => setExpandMute((prev) => !prev)}
-                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors"
-                    >
-                      <div className="flex items-center gap-3 text-slate-700">
-                        <BellOff className="w-4 h-4 text-slate-500" />
-                        <span className="text-[13px] font-semibold">
-                          Tắt thông báo
-                        </span>
-                      </div>
-                      <ChevronDown
-                        className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${expandMute ? "rotate-180" : ""}`}
-                      />
-                    </button>
-                    {expandMute && (
-                      <div className="px-4 pb-3 pt-2 flex flex-col gap-1 border-t border-slate-100">
-                        {[
-                          { key: "1h", label: "1 giờ" },
-                          { key: "8h", label: "8 giờ" },
-                          { key: "24h", label: "24 giờ" },
-                        ].map((opt) => (
-                          <label
-                            key={opt.key}
-                            className="flex items-center gap-3 py-1.5 cursor-pointer group"
-                          >
-                            <input
-                              type="radio"
-                              name="muteOption"
-                              checked={muteOption === opt.key}
-                              onChange={() =>
-                                setMuteOption(opt.key as "1h" | "8h" | "24h")
-                              }
-                              className="w-4 h-4 accent-[#0056C6] cursor-pointer"
-                            />
-                            <span className="text-[13px] text-slate-700 group-hover:text-slate-900">
-                              {opt.label}
-                            </span>
-                          </label>
-                        ))}
-                        <div className="border-t border-slate-100 mt-1 pt-2 flex items-center justify-between">
-                          <span className="text-[13px] text-slate-700">
-                            Đến khi bật lại
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => setMuteForever((prev) => !prev)}
-                            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${
-                              muteForever ? "bg-[#0056C6]" : "bg-slate-200"
-                            }`}
-                          >
-                            <span
-                              className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${
-                                muteForever
-                                  ? "translate-x-4.5"
-                                  : "translate-x-0.5"
-                              }`}
-                            />
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+            {/* RIGHT SIDEBAR: Options Panel */}
+            {showOptionsPanel && activeThread && (
+              <ChatOptionsPanel
+                thread={activeThread}
+                expandBg={expandBg}
+                expandAutoDelete={expandAutoDelete}
+                autoDeleteOption={autoDeleteOption}
+                expandMute={expandMute}
+                muteOption={muteOption}
+                muteForever={muteForever}
+                onToggleExpandBg={() => setExpandBg(p => !p)}
+                onToggleExpandAutoDelete={() => setExpandAutoDelete(p => !p)}
+                onSetAutoDeleteOption={setAutoDeleteOption}
+                onToggleExpandMute={() => setExpandMute(p => !p)}
+                onSetMuteOption={setMuteOption}
+                onToggleMuteForever={() => setMuteForever(p => !p)}
+              />
             )}
           </>
         ) : (
-          /* ================= WELCOME CAROUSEL (LIGHT & COHESIVE THEME) ================= */
-          <div className="flex-1 flex flex-col h-full bg-gradient-to-br from-white to-slate-50/80 text-slate-800 relative items-center justify-center overflow-hidden p-12">
-            {/* Left slide arrow */}
-            <button
-              type="button"
-              onClick={handlePrevWelcomeSlide}
-              className="absolute left-10 top-1/2 transform -translate-y-1/2 w-11 h-11 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 cursor-pointer transition-all z-20 border border-slate-200/50 active:scale-90 shadow-sm"
-              title="Slide trước"
-            >
-              <svg
-                className="w-6 h-6 stroke-current fill-none stroke-[2.5]"
-                viewBox="0 0 24 24"
-              >
-                <polyline points="15 18 9 12 15 6" />
-              </svg>
-            </button>
-
-            {/* Right slide arrow */}
-            <button
-              type="button"
-              onClick={handleNextWelcomeSlide}
-              className="absolute right-10 top-1/2 transform -translate-y-1/2 w-11 h-11 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 cursor-pointer transition-all z-20 border border-slate-200/50 active:scale-90 shadow-sm"
-              title="Slide sau"
-            >
-              <svg
-                className="w-6 h-6 stroke-current fill-none stroke-[2.5]"
-                viewBox="0 0 24 24"
-              >
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
-            </button>
-
-            {/* Active Slide content wrapper */}
-            <div className="max-w-md w-full flex flex-col items-center text-center px-4 transition-all duration-300">
-              <h2 className="text-[21px] font-bold text-slate-800 tracking-tight mb-2.5">
-                {welcomeSlides[currentWelcomeSlide].title}
-              </h2>
-
-              <p className="text-[12.8px] text-slate-500 leading-relaxed max-w-sm mb-9">
-                {welcomeSlides[currentWelcomeSlide].description}
-              </p>
-
-              {/* Slider Image Illustration box */}
-              <div className="relative w-80 h-48 rounded-xl overflow-hidden shadow-md border border-slate-200 mb-8 bg-slate-100 flex items-center justify-center select-none group">
-                <img
-                  src={welcomeSlides[currentWelcomeSlide].image}
-                  alt="Slide illustration"
-                  className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700"
-                />
-
-                {/* Visual accent for dark mode slide */}
-                {currentWelcomeSlide === 1 && (
-                  <div className="absolute inset-0 bg-slate-950/20 flex items-center justify-center">
-                    <span className="w-14 h-14 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-yellow-500 border border-slate-250 text-2xl shadow-md animate-pulse">
-                      🌙
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Tag / Badge */}
-              <span className="text-[13px] font-bold text-[#0056C6] tracking-wide block mb-1.5">
-                {welcomeSlides[currentWelcomeSlide].badge}
-              </span>
-
-              {/* Detail sub-bullet */}
-              <p className="text-[11.8px] text-slate-450 leading-relaxed mb-8 max-w-[280px]">
-                {welcomeSlides[currentWelcomeSlide].detail}
-              </p>
-
-              {/* Optional Call to Action Button */}
-              {welcomeSlides[currentWelcomeSlide].actionText && (
-                <button
-                  type="button"
-                  onClick={() => alert("Đã áp dụng cài đặt giao diện tối!")}
-                  className="bg-[#0056C6] hover:bg-[#0047A5] text-white font-bold text-xs px-6 py-2.5 rounded-lg transition-colors cursor-pointer shadow-sm active:scale-95 focus:outline-none"
-                >
-                  {welcomeSlides[currentWelcomeSlide].actionText}
-                </button>
-              )}
-            </div>
-
-            {/* Dots navigation indicator */}
-            <div className="absolute bottom-12 flex gap-2.5 z-20">
-              {welcomeSlides.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentWelcomeSlide(idx)}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    idx === currentWelcomeSlide
-                      ? "bg-[#0056C6] w-5"
-                      : "bg-slate-200 hover:bg-slate-350 w-1.5"
-                  }`}
-                  title={`Tới slide ${idx + 1}`}
-                />
-              ))}
-            </div>
-          </div>
+          <WelcomeCarousel
+            slides={welcomeSlides}
+            currentSlide={currentWelcomeSlide}
+            onPrev={handlePrevWelcomeSlide}
+            onNext={handleNextWelcomeSlide}
+            onDotClick={setCurrentWelcomeSlide}
+          />
         )}
       </div>
 
       {/* Create Group Modal */}
       {showCreateGroupModal && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-[460px] flex flex-col overflow-hidden">
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-              <h3 className="text-[15px] font-bold text-slate-800">Tạo nhóm chat mới</h3>
-              <button
-                type="button"
-                onClick={() => { setShowCreateGroupModal(false); setNewGroupName(""); setSelectedMembers([]); setMemberSearch(""); }}
-                className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 cursor-pointer transition-colors"
-              >
-                <X className="w-4.5 h-4.5" />
-              </button>
-            </div>
-
-            {/* Avatar + Name input */}
-            <div className="flex items-center gap-4 px-5 pt-5 pb-4">
-              <div className="relative shrink-0">
-                <div className="w-14 h-14 rounded-full bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center cursor-pointer hover:bg-slate-150 transition-colors">
-                  <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </div>
-                <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-[#0056C6] flex items-center justify-center shadow">
-                  <Plus className="w-3 h-3 text-white" />
-                </div>
-              </div>
-              <input
-                type="text"
-                value={newGroupName}
-                onChange={e => setNewGroupName(e.target.value)}
-                placeholder="Nhập tên nhóm"
-                className="flex-1 h-10 px-4 bg-slate-50 border border-slate-200 rounded-xl text-[13.5px] text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#0056C6] focus:ring-1 focus:ring-[#0056C6] transition-all"
-              />
-            </div>
-
-            {/* Member selection */}
-            <div className="px-5 pb-2">
-              <p className="text-[12px] font-bold text-slate-500 uppercase tracking-wide mb-2">Chọn thành viên</p>
-              {/* Search */}
-              <div className="flex items-center gap-2 bg-slate-100 rounded-xl px-3 py-2 mb-3">
-                <Search className="w-4 h-4 text-slate-400 shrink-0" />
-                <input
-                  type="text"
-                  value={memberSearch}
-                  onChange={e => setMemberSearch(e.target.value)}
-                  placeholder="Tìm kiếm bạn bè"
-                  className="flex-1 bg-transparent text-[13px] text-slate-700 placeholder-slate-400 outline-none"
-                />
-              </div>
-
-              {/* Contact list */}
-              <div className="flex flex-col max-h-[240px] overflow-y-auto -mx-1 px-1">
-                {filteredContacts.map(contact => {
-                  const isSelected = selectedMembers.includes(contact.id);
-                  return (
-                    <label
-                      key={contact.id}
-                      className="flex items-center gap-3 py-2.5 px-2 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors group"
-                    >
-                      <div className={`w-10 h-10 rounded-full ${contact.avatarBg} text-white font-bold text-[13px] flex items-center justify-center shrink-0 shadow-sm`}>
-                        {contact.avatar}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[13.5px] font-semibold text-slate-800 truncate">{contact.name}</p>
-                        <p className={`text-[11.5px] ${contact.statusColor} font-medium`}>{contact.status}</p>
-                      </div>
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => handleToggleMember(contact.id)}
-                        className="w-4 h-4 accent-[#0056C6] rounded cursor-pointer"
-                      />
-                    </label>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Validation error */}
-            {(!newGroupName.trim() || selectedMembers.length < 2) && (newGroupName !== "" || selectedMembers.length > 0) && (
-              <div className="mx-5 mb-2 flex items-center gap-2 text-red-500 text-[12px]">
-                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="10" strokeWidth="2"/>
-                  <line x1="12" y1="8" x2="12" y2="12" strokeWidth="2"/>
-                  <line x1="12" y1="16" x2="12.01" y2="16" strokeWidth="2"/>
-                </svg>
-                <span>Vui lòng nhập tên nhóm và chọn ít nhất 2 thành viên</span>
-              </div>
-            )}
-
-            {/* Footer buttons */}
-            <div className="flex items-center justify-end gap-3 px-5 py-4 border-t border-slate-100">
-              <button
-                type="button"
-                onClick={() => { setShowCreateGroupModal(false); setNewGroupName(""); setSelectedMembers([]); setMemberSearch(""); }}
-                className="px-5 py-2 rounded-xl text-[13.5px] font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors"
-              >
-                Hủy
-              </button>
-              <button
-                type="button"
-                onClick={handleCreateGroup}
-                disabled={!newGroupName.trim() || selectedMembers.length < 2}
-                className={`px-5 py-2 rounded-xl text-[13.5px] font-bold transition-all ${
-                  newGroupName.trim() && selectedMembers.length >= 2
-                    ? "bg-[#0056C6] hover:bg-[#0047A5] text-white cursor-pointer shadow-sm active:scale-95"
-                    : "bg-slate-100 text-slate-400 cursor-not-allowed"
-                }`}
-              >
-                Tạo nhóm
-              </button>
-            </div>
-          </div>
-        </div>
+        <CreateGroupModal
+          contacts={mockContacts}
+          onClose={() => setShowCreateGroupModal(false)}
+          onCreateGroup={handleGroupCreated}
+        />
       )}
 
-      {/* Call Modal Overlay matching user mockup */}
+      {/* Call Modal */}
       {activeCall && (
-        <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-md z-50 flex items-center justify-center animate-fadeIn">
-          <div className="w-[360px] bg-[#1a2232] rounded-3xl p-8 text-white shadow-2xl border border-white/5 flex flex-col items-center relative animate-scaleUp">
-            {/* Top row */}
-            <div className="w-full flex justify-between items-center mb-6">
-              <button
-                type="button"
-                onClick={() => setActiveCall(null)}
-                className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/70 hover:text-white transition-colors cursor-pointer"
-              >
-                <ChevronDown className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/70 hover:text-white transition-colors cursor-pointer"
-              >
-                <svg
-                  className="w-4 h-4 fill-none stroke-current"
-                  viewBox="0 0 24 24"
-                  strokeWidth="2"
-                >
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                  <circle cx="9" cy="7" r="4" />
-                  <line x1="19" y1="8" x2="19" y2="14" />
-                  <line x1="22" y1="11" x2="16" y2="11" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Avatar & Ring */}
-            <div className="relative mb-6">
-              <div className="absolute inset-[-8px] rounded-full bg-blue-500/20 animate-ping" />
-              <div
-                className={`w-24 h-24 rounded-full ${activeCall.avatarBg} text-white text-3xl font-bold flex items-center justify-center border-4 border-white/10 relative z-10 shadow-lg`}
-              >
-                {activeCall.avatar}
-              </div>
-            </div>
-
-            {/* Contact Name & Status */}
-            <h3 className="text-[20px] font-bold tracking-wide mb-1.5">
-              {activeCall.contactName}
-            </h3>
-            <p className="text-[12.5px] text-white/50 font-semibold mb-8">
-              {activeCall.status === "ringing"
-                ? "Đang đổ chuông..."
-                : `Đã kết nối • ${formatTime(activeCall.seconds)}`}
-            </p>
-
-            {/* Controls row */}
-            <div className="flex gap-4 mb-9">
-              <button
-                type="button"
-                onClick={() => setIsMuted(!isMuted)}
-                className={`w-11 h-11 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-                  isMuted
-                    ? "bg-red-500/25 border border-red-500 text-red-500"
-                    : "bg-white/5 hover:bg-white/10 text-white"
-                }`}
-                title="Tắt tiếng"
-              >
-                {isMuted ? (
-                  <MicOff className="w-5 h-5" />
-                ) : (
-                  <Mic className="w-5 h-5" />
-                )}
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsSpeakerOn(!isSpeakerOn)}
-                className={`w-11 h-11 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-                  isSpeakerOn
-                    ? "bg-blue-500/25 border border-blue-500 text-blue-400"
-                    : "bg-white/5 hover:bg-white/10 text-white"
-                }`}
-                title="Loa ngoài"
-              >
-                {isSpeakerOn ? (
-                  <Volume2 className="w-5 h-5" />
-                ) : (
-                  <VolumeX className="w-5 h-5 text-white/70" />
-                )}
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsVideoOn(!isVideoOn)}
-                className={`w-11 h-11 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-                  isVideoOn
-                    ? "bg-green-500/25 border border-green-500 text-green-400"
-                    : "bg-white/5 hover:bg-white/10 text-white"
-                }`}
-                title="Camera"
-              >
-                {isVideoOn ? (
-                  <Video className="w-5 h-5" />
-                ) : (
-                  <VideoOff className="w-5 h-5" />
-                )}
-              </button>
-            </div>
-
-            {/* Accept / Decline buttons */}
-            <div className="flex gap-8">
-              {activeCall.status === "ringing" && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    setActiveCall((prev) =>
-                      prev ? { ...prev, status: "connected" } : null,
-                    )
-                  }
-                  className="w-14 h-14 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center text-white shadow-lg shadow-green-950/40 active:scale-95 transition-all cursor-pointer"
-                  title="Trả lời"
-                >
-                  <Phone className="w-6 h-6 fill-current" />
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={() => setActiveCall(null)}
-                className="w-14 h-14 rounded-full bg-red-500 hover:bg-red-650 flex items-center justify-center text-white shadow-lg shadow-red-950/40 active:scale-95 transition-all cursor-pointer"
-                title="Gác máy"
-              >
-                <Phone className="w-6 h-6 fill-current transform rotate-[135deg]" />
-              </button>
-            </div>
-          </div>
-        </div>
+        <CallModal
+          activeCall={activeCall}
+          isMuted={isMuted}
+          isSpeakerOn={isSpeakerOn}
+          isVideoOn={isVideoOn}
+          onClose={() => setActiveCall(null)}
+          onAccept={() => setActiveCall(prev => prev ? { ...prev, status: "connected" } : null)}
+          onToggleMute={() => setIsMuted(p => !p)}
+          onToggleSpeaker={() => setIsSpeakerOn(p => !p)}
+          onToggleVideo={() => setIsVideoOn(p => !p)}
+          formatTime={formatTime}
+        />
       )}
     </div>
   );
