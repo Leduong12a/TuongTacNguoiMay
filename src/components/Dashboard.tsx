@@ -17,12 +17,21 @@ interface DashboardProps {
   initialTab?: string
 }
 
+interface PendingChatContact {
+  id: string
+  name: string
+  avatar: string
+  avatarBg: string
+  status: string
+}
+
 export const Dashboard: React.FC<DashboardProps> = ({ onLogout, initialTab = 'chat' }) => {
   const [activeTab, setActiveTab] = useState<string>(initialTab)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false)
   const [isCreateStoryOpen, setIsCreateStoryOpen] = useState<boolean>(false)
   const [isCreatePostOpen, setIsCreatePostOpen] = useState<boolean>(false)
+  const [pendingChatContact, setPendingChatContact] = useState<PendingChatContact | null>(null)
 
   useEffect(() => {
     setActiveTab(initialTab)
@@ -106,9 +115,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, initialTab = 'ch
 
       <main className="flex-1 flex flex-col min-w-0 pt-14 md:pt-0 bg-[#F7F9FC] relative overflow-hidden">
         {activeTab === 'chat' ? (
-          <Chat />
+          <Chat
+            initialContact={pendingChatContact}
+            onInitialContactConsumed={() => setPendingChatContact(null)}
+          />
         ) : activeTab === 'contacts' ? (
-          <Contacts />
+          <Contacts onNavigateToChat={(contact) => {
+            setPendingChatContact(contact)
+            setActiveTab('chat')
+          }} />
         ) : activeTab === 'calls' ? (
           <Calls />
         ) : activeTab === 'search' ? (

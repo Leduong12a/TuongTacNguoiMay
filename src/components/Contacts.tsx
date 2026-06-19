@@ -79,7 +79,19 @@ interface GroupChat {
   memberNames: string[]
 }
 
-export const Contacts: React.FC = () => {
+interface ContactNavTarget {
+  id: string
+  name: string
+  avatar: string
+  avatarBg: string
+  status: string
+}
+
+interface ContactsProps {
+  onNavigateToChat?: (contact: ContactNavTarget) => void
+}
+
+export const Contacts: React.FC<ContactsProps> = ({ onNavigateToChat }) => {
   // Alphabetically grouped contacts
   const [contacts, setContacts] = useState<Contact[]>([
     { 
@@ -1119,7 +1131,15 @@ export const Contacts: React.FC = () => {
               
               <button
                 onClick={() => {
-                  alert(`Mở hộp thoại chat với ${activeProfileUser.name}`)
+                  if (onNavigateToChat) {
+                    onNavigateToChat({
+                      id: activeProfileUser.id,
+                      name: activeProfileUser.name,
+                      avatar: activeProfileUser.avatar,
+                      avatarBg: activeProfileUser.avatarBg || 'bg-blue-500',
+                      status: activeProfileUser.status || 'offline',
+                    })
+                  }
                   setActiveProfileUser(null)
                 }}
                 className="flex-1 h-11 bg-[#0056C6] hover:bg-[#0047A5] text-white text-[13.5px] font-bold rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer focus:outline-none"

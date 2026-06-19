@@ -55,7 +55,18 @@ const welcomeSlides = [
   },
 ];
 
-export const Chat: React.FC = () => {
+interface ChatProps {
+  initialContact?: {
+    id: string
+    name: string
+    avatar: string
+    avatarBg: string
+    status: string
+  } | null
+  onInitialContactConsumed?: () => void
+}
+
+export const Chat: React.FC<ChatProps> = ({ initialContact, onInitialContactConsumed }) => {
   // Mock chat threads list (including group and direct messages)
   const [threads, setThreads] = useState<ChatThread[]>([
     {
@@ -241,6 +252,41 @@ export const Chat: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [messageText, setMessageText] = useState("");
   const [activeTab, setActiveTab] = useState<"all" | "unread">("all");
+
+  // Handle navigation from Contacts page: open or create thread for the given contact
+  useEffect(() => {
+    if (!initialContact) return;
+
+    setThreads(prev => {
+      const existing = prev.find(
+        t => !t.isGroup && t.name.toLowerCase() === initialContact.name.toLowerCase()
+      );
+
+      if (existing) {
+        setActiveThreadId(existing.id);
+        return prev;
+      }
+
+      // Create a new direct-message thread
+      const newThread: ChatThread = {
+        id: `dm_${Date.now()}`,
+        name: initialContact.name,
+        avatar: initialContact.avatar,
+        avatarBg: initialContact.avatarBg,
+        isGroup: false,
+        lastMessage: 'Bắt đầu cuộc trò chuyện',
+        time: 'Vừa xong',
+        unreadCount: 0,
+        status: initialContact.status === 'online' ? 'online' : 'offline',
+        messages: [],
+      };
+      setActiveThreadId(newThread.id);
+      return [newThread, ...prev];
+    });
+
+    onInitialContactConsumed?.();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialContact]);
 
   // Welcome carousel slide index
   const [currentWelcomeSlide, setCurrentWelcomeSlide] = useState(0);
